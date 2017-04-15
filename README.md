@@ -1,7 +1,6 @@
-# jotaelesalinas/laravel-simple-ldap/auth
+# jotaelesalinas/laravel-simple-ldap-auth
 
-This is a basic [Laravel](https://laravel.com/) installation manual (tested with version 5.4)
-adapted to log in users from an external LDAP server.
+This is a basic step-by-step [Laravel](https://laravel.com/) installation manual adapted for _adminless_ LDAP authentication.
 
 There is no user management at all. Users are either allowed to use the website or rejected. That's it.
 
@@ -18,6 +17,8 @@ to this specific use case.
 As testing environment, we will be using a local Sqlite database and this publicly available testing LDAP server:
 
 [http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
+
+Tested with Laravel v5.4 and Adldap2-Laravel v3.0.4.
 
 ## Steps
 
