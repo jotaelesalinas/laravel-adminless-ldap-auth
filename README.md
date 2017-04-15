@@ -1,6 +1,6 @@
-# jotaelesalinas/laravel-simple-ldap-auth
+# Howto: _adminless_ LDAP authentification in Laravel
 
-This is a basic step-by-step [Laravel](https://laravel.com/) installation manual adapted for _adminless_ LDAP authentication.
+This is a detailed step-by-step [Laravel](https://laravel.com/) installation manual adapted for _adminless_ LDAP authentication.
 
 There is no user management at all. Users are either allowed to use the website or rejected. That's it.
 
@@ -29,12 +29,7 @@ composer create-project laravel/laravel laravel-simple-ldap-auth
 cd laravel-simple-ldap
 ```
 
-### 2. Add `build` folder and `composer.lock` to `.gitignore`:
-
-```
-/build
-composer.lock
-```
+### 2. Add `/build` and `composer.lock` to `.gitignore`:
 
 ### 3. Install Adldap2-Laravel
 
@@ -107,7 +102,7 @@ Adldap2 kept trying to connect as administrator using the default setup, so I ha
 
 This configuration specifies which fields are copied from the LDAP server into the local database for each logged in user.
 
-Some examples could be an attribute "role" or "session_expiration_in_minutes". I am sure you can think of many other uses.
+Some examples of extra attributes to synchronize could be "role" to control access to certain areas or "session_expiration_in_minutes" to force logout after some time. I am sure you can think of many other uses.
 
 ```
 'usernames' => [
@@ -180,13 +175,13 @@ php artisan make:auth
 
 This last command installed many controllers and views that we are not going to need, so let's remove them.
 
-### 16. Delete these files
+### 16. Delete these files and folder
 
 - `app/Http/Controllers/Auth/ForgotPasswordController.php`
 - `app/Http/Controllers/Auth/RegisterController.php`
 - `app/Http/Controllers/Auth/ResetPasswordController.php`
 - `resources/views/auth/register.blade.php`
-- `resources/views/auth/passwords`
+- `resources/views/auth/passwords` --> remove folder and all files inside
 
 ### 17. Remove this line from `resources/views/layouts/app.blade.php`
 
