@@ -69,7 +69,7 @@ composer require adldap2/adldap2-laravel
 php artisan vendor:publish
 ```
 
-### 7. Configure the Adldap2 connection in `adldap.php`
+### 7. Configure the Adldap2 connection in `config/adldap.php`
 
 Here, I tried to add a new connection and leave `default` untouched, but it didn't work.
 Adldap2 kept trying to connect as administrator using the default setup, so I had to modify `default` directly:
@@ -148,7 +148,9 @@ DB_PASSWORD=secret    --> remove line
 $table->string('username')->unique(); // was 'email'
 ```
 
-### 12. Change `app/User.php`
+### 12. Delete the file `database/migrations/2014_10_12_100000_create_password_resets_table.php`
+
+### 13. Change `app/User.php`
 
 ```
 protected $fillable = [
@@ -156,24 +158,22 @@ protected $fillable = [
 ];
 ```
 
-### 13. Delete the file `database/migrations/2014_10_12_100000_create_password_resets_table.php`
-
 ### 14. Run the migration to create the `users` table
 
-Before migrating, make sure that your database is working properly.
+Before migrating, make sure that your database is configured and working properly.
 
 ```bash
 touch database/database.sqlite
 php artisan migrate
 ```
 
-### 15. Install Laravel's built-in Auth
+### 15. Install Laravel's built-in Auth scaffolding
 
 ```bash
 php artisan make:auth
 ```
 
-This last command installed many controllers and views that we are not going to need, so let's remove them.
+This last command installs many controllers and views that we are not going to need, so let's remove them.
 
 ### 16. Delete these files and folder
 
@@ -196,8 +196,6 @@ This last command installed many controllers and views that we are not going to 
 ```
 
 ### 19. Change 'email' for 'username' in `resources/views/auth/login.blade.php`
-
-We are using usernames instead of emails -Laravel's default,- so we need some changes in the login view.
 
 ```
 <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
@@ -276,9 +274,14 @@ Visit `http://localhost:8000` in your favourite browser.
 
 Try to visit `http://localhost:8000/home` before logging in.
 
-
 Remember that you have these users available in the testing LDAP server:
 `riemann`, `gauss`, `euler`, `euclid`, `einstein`, `newton`, `galieleo` and `tesla`.
 The password is `password` for all of them.
+
+Also, please, don't forget to set the web server port to `8000` in your `.env` file:
+
+```
+APP_URL=http://localhost:8000
+```
 
 Log in. Play around. Enjoy life!
