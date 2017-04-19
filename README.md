@@ -29,7 +29,12 @@ composer create-project laravel/laravel laravel-simple-ldap-auth
 cd laravel-simple-ldap
 ```
 
-### 2. Add `/build` and `composer.lock` to `.gitignore`:
+### 2. Add `/build` and `composer.lock` to `.gitignore` (if needed):
+
+```bash
+echo "/build" >> .gitignore
+echo "composer.lock" >> .gitignore
+```
 
 ### 3. Install Adldap2-Laravel
 
@@ -131,15 +136,15 @@ ADLDAP_USER_FORMAT=uid=%s,dc=example,dc=com
 
 ### 10. Configure your database in `.env`
 
-Use whatever you need. Here you see changes for Sqlite.
+Use whatever you need. Here you see the changes I did to use Sqlite.
 
 ```
-DB_CONNECTION=sqlite  --> was 'mysql'
-DB_HOST=127.0.0.1     --> remove line
-DB_PORT=3306          --> remove line
-DB_DATABASE=homestead --> remove line
-DB_USERNAME=homestead --> remove line
-DB_PASSWORD=secret    --> remove line
+DB_CONNECTION=sqlite                 # was 'mysql'
+DB_DATABASE=database/database.sqlite # was 'homestead'
+DB_HOST=127.0.0.1                    # remove this line
+DB_PORT=3306                         # remove this line
+DB_USERNAME=homestead                # remove this line
+DB_PASSWORD=secret                   # remove this line
 ```
 
 ### 11. Change `database/migrations/2014_10_12_000000_create_users_table.php`
@@ -158,24 +163,19 @@ protected $fillable = [
 ];
 ```
 
-### 14. Run the migration to create the `users` table
+### 14. Run the migration to create the `users` table and Auth scaffolding
 
 Before migrating, make sure that your database is configured and working properly.
 
 ```bash
 touch database/database.sqlite
 php artisan migrate
-```
-
-### 15. Install Laravel's built-in Auth scaffolding
-
-```bash
 php artisan make:auth
 ```
 
 This last command installs many controllers and views that we are not going to need, so let's remove them.
 
-### 16. Delete these files and folder
+### 15. Delete these files and folder
 
 - `app/Http/Controllers/Auth/ForgotPasswordController.php`
 - `app/Http/Controllers/Auth/RegisterController.php`
@@ -183,19 +183,19 @@ This last command installs many controllers and views that we are not going to n
 - `resources/views/auth/register.blade.php`
 - `resources/views/auth/passwords` --> remove folder and all files inside
 
-### 17. Remove this line from `resources/views/layouts/app.blade.php`
+### 16. Remove this line from `resources/views/layouts/app.blade.php`
 
 ```
 <li><a href="{{ route('register') }}">Register</a></li>
 ```
 
-### 18. Remove this line from `resources/views/welcome.blade.php`
+### 17. Remove this line from `resources/views/welcome.blade.php`
 
 ```
 <a href="{{ url('/register') }}">Register</a>
 ```
 
-### 19. Change 'email' for 'username' in `resources/views/auth/login.blade.php`
+### 18. Change 'email' for 'username' in `resources/views/auth/login.blade.php`
 
 ```
 <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
@@ -211,7 +211,7 @@ This last command installs many controllers and views that we are not going to n
 </div>
 ```
 
-### 20. Add these methods to LoginController in `app/Http/Controllers/Auth/LoginController.php`
+### 19. Add these methods to LoginController in `app/Http/Controllers/Auth/LoginController.php`
 
 Don't forget the `use` instructions.
 
@@ -278,7 +278,7 @@ Remember that you have these users available in the testing LDAP server:
 `riemann`, `gauss`, `euler`, `euclid`, `einstein`, `newton`, `galieleo` and `tesla`.
 The password is `password` for all of them.
 
-Also, please, don't forget to set the web server port to `8000` in your `.env` file:
+Also, please, don't forget to set the web server port to `8000` in your local testing `.env` file:
 
 ```
 APP_URL=http://localhost:8000
