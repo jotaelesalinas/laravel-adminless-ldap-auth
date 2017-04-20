@@ -22,27 +22,16 @@ Tested with Laravel v5.4 and Adldap2-Laravel v3.0.4.
 
 ## Steps
 
-### 1. Create a new Laravel project
+### 1. Create a new Laravel project and install Adldap2-Laravel
 
 ```bash
 composer create-project laravel/laravel laravel-simple-ldap-auth
 cd laravel-simple-ldap
-```
-
-### 2. Add `/build` and `composer.lock` to `.gitignore` (if needed):
-
-```bash
-echo "/build" >> .gitignore
-echo "composer.lock" >> .gitignore
-```
-
-### 3. Install Adldap2-Laravel
-
-```bash
 composer require adldap2/adldap2-laravel
+php artisan vendor:publish
 ```
 
-### 4. Register Adldap's service providers and façade in `config/app.php`
+### 2. Register Adldap's service providers and façade in `config/app.php`
   
 ```
 'providers' => [
@@ -57,7 +46,7 @@ composer require adldap2/adldap2-laravel
 ],
 ```
 
-### 5. Change the driver of the user provider in `config/auth.php`
+### 3. Change the driver of the user provider in `config/auth.php`
 
 ```
 'providers' => [
@@ -68,13 +57,7 @@ composer require adldap2/adldap2-laravel
 ],
 ```
 
-### 6. Copy Adldap2's configuration files to the `config` folder:
-
-```
-php artisan vendor:publish
-```
-
-### 7. Configure the Adldap2 connection in `config/adldap.php`
+### 4. Configure the Adldap2 connection in `config/adldap.php`
 
 Here, I tried to add a new connection and leave `default` untouched, but it didn't work.
 Adldap2 kept trying to connect as administrator using the default setup, so I had to modify `default` directly:
@@ -103,7 +86,7 @@ Adldap2 kept trying to connect as administrator using the default setup, so I ha
 ],
 ```
 
-### 8. Change the usernames and attributes to synchronize in `config/adldap_auth.php`:
+### 5. Change the usernames and attributes to synchronize in `config/adldap_auth.php`:
 
 This configuration specifies which fields are copied from the LDAP server into the local database for each logged in user.
 
@@ -121,7 +104,7 @@ Some examples of extra attributes to synchronize could be "role" to control acce
 ],
 ```
 
-### 9. Configure your LDAP connections in `.env`
+### 6. Configure your LDAP and database connections in `.env`
 
 FYI, configuration that is secret, e.g. API tokens or database passwords, should be store in this file,
 which is included by default in `.gitignore` by Laravel.
@@ -132,30 +115,24 @@ ADLDAP_CONTROLLERS=ldap.forumsys.com
 ADLDAP_BASEDN=dc=example,dc=com
 ADLDAP_USER_ATTRIBUTE=uid
 ADLDAP_USER_FORMAT=uid=%s,dc=example,dc=com
+
+DB_CONNECTION=sqlite  # was 'mysql'
+DB_HOST=127.0.0.1     # remove this line
+DB_PORT=3306          # remove this line
+DB_DATABASE=homestead # remove this line
+DB_USERNAME=homestead # remove this line
+DB_PASSWORD=secret    # remove this line
 ```
 
-### 10. Configure your database in `.env`
-
-Use whatever you need. Here you see the changes I did to use Sqlite.
-
-```
-DB_CONNECTION=sqlite                 # was 'mysql'
-DB_DATABASE=database/database.sqlite # was 'homestead'
-DB_HOST=127.0.0.1                    # remove this line
-DB_PORT=3306                         # remove this line
-DB_USERNAME=homestead                # remove this line
-DB_PASSWORD=secret                   # remove this line
-```
-
-### 11. Change `database/migrations/2014_10_12_000000_create_users_table.php`
+### 7. Change `database/migrations/2014_10_12_000000_create_users_table.php`
 
 ```
 $table->string('username')->unique(); // was 'email'
 ```
 
-### 12. Delete the file `database/migrations/2014_10_12_100000_create_password_resets_table.php`
+### 8. Delete the file `database/migrations/2014_10_12_100000_create_password_resets_table.php`
 
-### 13. Change `app/User.php`
+### 9. Change `app/User.php`
 
 ```
 protected $fillable = [
@@ -163,7 +140,7 @@ protected $fillable = [
 ];
 ```
 
-### 14. Run the migration to create the `users` table and Auth scaffolding
+### 10 Run the migration to create the `users` table and Auth scaffolding
 
 Before migrating, make sure that your database is configured and working properly.
 
@@ -175,7 +152,7 @@ php artisan make:auth
 
 This last command installs many controllers and views that we are not going to need, so let's remove them.
 
-### 15. Delete these files and folder
+### 11. Delete these files and folder
 
 - `app/Http/Controllers/Auth/ForgotPasswordController.php`
 - `app/Http/Controllers/Auth/RegisterController.php`
@@ -183,19 +160,19 @@ This last command installs many controllers and views that we are not going to n
 - `resources/views/auth/register.blade.php`
 - `resources/views/auth/passwords` --> remove folder and all files inside
 
-### 16. Remove this line from `resources/views/layouts/app.blade.php`
+### 12. Remove this line from `resources/views/layouts/app.blade.php`
 
 ```
 <li><a href="{{ route('register') }}">Register</a></li>
 ```
 
-### 17. Remove this line from `resources/views/welcome.blade.php`
+### 13. Remove this line from `resources/views/welcome.blade.php`
 
 ```
 <a href="{{ url('/register') }}">Register</a>
 ```
 
-### 18. Change 'email' for 'username' in `resources/views/auth/login.blade.php`
+### 14. Change 'email' for 'username' in `resources/views/auth/login.blade.php`
 
 ```
 <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
@@ -211,7 +188,7 @@ This last command installs many controllers and views that we are not going to n
 </div>
 ```
 
-### 19. Add these methods to LoginController in `app/Http/Controllers/Auth/LoginController.php`
+### 15. Add these methods to LoginController in `app/Http/Controllers/Auth/LoginController.php`
 
 Don't forget the `use` instructions.
 
