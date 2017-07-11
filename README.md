@@ -28,11 +28,10 @@ Tested with Laravel v5.4 and Adldap2-Laravel v3.0.4.
 composer create-project laravel/laravel laravel-simple-ldap-auth
 cd laravel-simple-ldap
 composer require adldap2/adldap2-laravel
-php artisan vendor:publish
 ```
 
 ### 2. Register Adldap's service providers and façade in `config/app.php`
-  
+ 
 ```
 'providers' => [
     ...
@@ -44,6 +43,12 @@ php artisan vendor:publish
     ...
     'Adldap' => Adldap\Laravel\Facades\Adldap::class,
 ],
+```
+
+#### 2b. Publish Adldap
+
+```bash
+php artisan vendor:publish --tag="adldap"
 ```
 
 ### 3. Change the driver of the user provider in `config/auth.php`
