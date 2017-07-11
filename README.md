@@ -18,15 +18,13 @@ As testing environment, we will be using a local Sqlite database and this public
 
 [http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
 
-Tested with Laravel v5.4 and Adldap2-Laravel v3.0.4.
-
-## Steps
+Tested on 2017-07-11 with Laravel v5.4.28 and Adldap2-Laravel v3.0.4.
 
 ### 1. Create a new Laravel project and install Adldap2-Laravel
 
 ```bash
 composer create-project laravel/laravel laravel-simple-ldap-auth
-cd laravel-simple-ldap
+cd laravel-simple-ldap-auth
 composer require adldap2/adldap2-laravel
 ```
 
