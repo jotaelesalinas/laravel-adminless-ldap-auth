@@ -30,7 +30,7 @@ composer require adldap2/adldap2-laravel
 
 ### 2. Register Adldap's service providers and façade in `config/app.php`
  
-```
+```php
 'providers' => [
     ...
     Adldap\Laravel\AdldapServiceProvider::class,
@@ -51,7 +51,7 @@ php artisan vendor:publish --tag="adldap"
 
 ### 3. Change the driver of the user provider in `config/auth.php`
 
-```
+```php
 'providers' => [
     'users' => [
         'driver' => 'adldap', // was 'eloquent'
@@ -65,7 +65,7 @@ php artisan vendor:publish --tag="adldap"
 Here, I tried to add a new connection and leave `default` untouched, but it didn't work.
 Adldap2 kept trying to connect as administrator using the default setup, so I had to modify `default` directly:
 
-```
+```php
 'connections' => [
     'default' => [
         'auto_connect' => false,
@@ -95,7 +95,7 @@ This configuration specifies which fields are copied from the LDAP server into t
 
 Some examples of extra attributes to synchronize could be "role" to control access to certain areas or "session_expiration_in_minutes" to force logout after some time. I am sure you can think of many other uses.
 
-```
+```php
 'usernames' => [
     'ldap' => env('ADLDAP_USER_ATTRIBUTE', 'userprincipalname'), // was just 'userprincipalname'
     'eloquent' => 'username', // was 'email'
@@ -129,7 +129,7 @@ DB_PASSWORD=secret    # remove this line
 
 ### 7. Change `database/migrations/2014_10_12_000000_create_users_table.php`
 
-```
+```php
 $table->string('username')->unique(); // was 'email'
 ```
 
@@ -137,7 +137,7 @@ $table->string('username')->unique(); // was 'email'
 
 ### 9. Change `app/User.php`
 
-```
+```php
 protected $fillable = [
     'name', 'username', 'password', // was 'email' instead of 'username'
 ];
@@ -165,19 +165,19 @@ This last command installs many controllers and views that we are not going to n
 
 ### 12. Remove this line from `resources/views/layouts/app.blade.php`
 
-```
+```html
 <li><a href="{{ route('register') }}">Register</a></li>
 ```
 
 ### 13. Remove this line from `resources/views/welcome.blade.php`
 
-```
+```html
 <a href="{{ url('/register') }}">Register</a>
 ```
 
 ### 14. Change 'email' for 'username' in `resources/views/auth/login.blade.php`
 
-```
+```html
 <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
     <label for="username" class="col-md-4 control-label">Username</label>
     <div class="col-md-6">
@@ -195,7 +195,7 @@ This last command installs many controllers and views that we are not going to n
 
 Don't forget the `use` instructions.
 
-```
+```php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Adldap\Laravel\Facades\Adldap;
@@ -250,7 +250,7 @@ We're done!
 
 Let's run the website and try to log in.
 
-```
+```bash
 php artisan serve
 ```
 
