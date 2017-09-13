@@ -223,17 +223,21 @@ class LoginController extends Controller {
         $userdn = sprintf($user_format, $username);
         
         if(Adldap::auth()->attempt($userdn, $password, $bindAsUser = true)) {
+            // the user exists in the LDAP server, with the provided password
             $user = \App\User::where($this->username(), $username) -> first();
             if ( !$user ) {
+                // the user doesn't exist in the local database
                 $user = new \App\User();
                 $user->name = $username;
                 $user->username = $username;
                 $user->password = '';
             }
+            // by logging the user we create the session so there is no need to login again (in the configured time)
             $this->guard()->login($user, true);
             return true;
         }
         
+        // the user doesn't exist in the LDAP server or the password is wrong
         return false;
     }
     
