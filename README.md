@@ -109,8 +109,8 @@ Some examples of extra attributes to synchronize could be "role" to control acce
 
 ### 6. Configure your LDAP and database connections in `.env`
 
-FYI, configuration that is secret, e.g. API tokens or database passwords, should be store in this file,
-which is included by default in `.gitignore` by Laravel.
+FYI, configuration that is secret, i.e. API tokens or database passwords, should be stored in this file,
+which Laravel includes by default in `.gitignore`.
 
 ```
 ADLDAP_CONNECTION=default
