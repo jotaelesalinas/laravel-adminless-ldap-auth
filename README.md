@@ -248,6 +248,12 @@ class LoginController extends Controller {
 
 We're done!
 
+Don't forget to set the web server port to `8000` in your local testing `.env` file:
+
+```
+APP_URL=http://localhost:8000
+```
+
 Let's run the website and try to log in.
 
 ```bash
@@ -262,10 +268,6 @@ Remember that you have these users available in the testing LDAP server:
 `riemann`, `gauss`, `euler`, `euclid`, `einstein`, `newton`, `galieleo` and `tesla`.
 The password is `password` for all of them.
 
-Also, please, don't forget to set the web server port to `8000` in your local testing `.env` file:
+Log in and play around.
 
-```
-APP_URL=http://localhost:8000
-```
-
-Log in. Play around. Enjoy life!
+Was this article useful? Give it a star!
