@@ -95,6 +95,8 @@ This configuration specifies which fields are copied from the LDAP server into t
 
 Some examples of extra attributes to synchronize could be "role" to control access to certain areas or "session_expiration_in_minutes" to force logout after some time. I am sure you can think of many other uses.
 
+The number of fields available in the testing LDAP server is limited, so we will add `'phone'` as an example.
+
 ```php
 'usernames' => [
     'ldap' => env('ADLDAP_USER_ATTRIBUTE', 'userprincipalname'), // was just 'userprincipalname'
@@ -102,8 +104,10 @@ Some examples of extra attributes to synchronize could be "role" to control acce
 ],
 
 'sync_attributes' => [
+    // 'field_in_local_db' => 'attribute_in_ldap_server',
     'username' => 'uid', // was 'email' => 'userprincipalname',
     'name' => 'cn',
+    'phone' => 'telephonenumber',
 ],
 ```
 
@@ -130,7 +134,18 @@ DB_PASSWORD=secret    # remove this line
 ### 7. Change `database/migrations/2014_10_12_000000_create_users_table.php`
 
 ```php
-$table->string('username')->unique(); // was 'email'
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('username')->unique(); // was 'email'
+            $table->string('password');
+            $table->string('name'); // to be read from LDAP
+            $table->string('phone'); // extra field to read from LDAP
+            $table->rememberToken();
+            $table->timestamps();
+        });
+    }
 ```
 
 ### 8. Delete the file `database/migrations/2014_10_12_100000_create_password_resets_table.php`
@@ -139,7 +154,8 @@ $table->string('username')->unique(); // was 'email'
 
 ```php
 protected $fillable = [
-    'name', 'username', 'password', // was 'email' instead of 'username'
+    // replace 'email' with 'username' and add 'phone'
+    'name', 'username', 'password', 'phone',
 ];
 ```
 
@@ -224,21 +240,92 @@ class LoginController extends Controller {
         
         if(Adldap::auth()->attempt($userdn, $password, $bindAsUser = true)) {
             // the user exists in the LDAP server, with the provided password
+            
             $user = \App\User::where($this->username(), $username) -> first();
-            if ( !$user ) {
-                // the user doesn't exist in the local database
+            if (!$user) {
+                // the user doesn't exist in the local database, so we have to create one
+                
                 $user = new \App\User();
-                $user->name = $username;
                 $user->username = $username;
                 $user->password = '';
+                
+                // you can skip this if there are no extra attributes to read from the LDAP server
+                // or you can move it below this if(!$user) block if you want to keep the user always
+                // in sync with the LDAP server 
+                $sync_attrs = $this->retrieveSyncAttributes($username);
+                foreach ($sync_attrs as $field => $value) {
+                    $user->$field = $value !== null ? $value : '';
+                }
             }
+            
             // by logging the user we create the session so there is no need to login again (in the configured time)
             $this->guard()->login($user, true);
             return true;
         }
         
         // the user doesn't exist in the LDAP server or the password is wrong
+        // log error
         return false;
+    }
+    
+    protected function retrieveSyncAttributes($username) {
+        $ldapuser = Adldap::search()->where(env('ADLDAP_USER_ATTRIBUTE'), '=', $username)->first();
+        if ( !$ldapuser ) {
+            // log error
+            return false;
+        }
+        // if you want to see the list of available attributes in your specific LDAP server:
+        // var_dump($ldapuser->attributes); exit;
+        
+        // needed if any attribute is not directly accessible via a method call.
+        // attributes in \Adldap\Models\User are protected, so we will need
+        // to retrieve them using reflection.
+        $ldapuser_attrs = null;
+        
+        $attrs = [];
+        
+        foreach (config('adldap_auth.sync_attributes') as $local_attr => $ldap_attr) {
+            if ( $local_attr == 'username' ) {
+                continue;
+            }
+            
+            $method = 'get' . $ldap_attr;
+            if (method_exists($ldapuser, $method)) {
+                $attrs[$local_attr] = $ldapuser->$method();
+                continue;
+            }
+            
+            if ($ldapuser_attrs === null) {
+                $ldapuser_attrs = self::accessProtected($ldapuser, 'attributes');
+            }
+            
+            if (!isset($ldapuser_attrs[$ldap_attr])) {
+                // an exception could be thrown
+                $attrs[$local_attr] = null;
+                continue;
+            }
+            
+            if (!is_array($ldapuser_attrs[$ldap_attr])) {
+                $attrs[$local_attr] = $ldapuser_attrs[$ldap_attr];
+            }
+            
+            if (count($ldapuser_attrs[$ldap_attr]) == 0) {
+                // an exception could be thrown
+                $attrs[$local_attr] = null;
+                continue;
+            }
+            
+            $attrs[$local_attr] = $ldapuser_attrs[$ldap_attr][0];
+        }
+        
+        return $attrs;
+    }
+    
+    protected static function accessProtected ($obj, $prop) {
+        $reflection = new \ReflectionClass($obj);
+        $property = $reflection->getProperty($prop);
+        $property->setAccessible(true);
+        return $property->getValue($obj);
     }
     
 }
