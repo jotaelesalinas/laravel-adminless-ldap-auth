@@ -315,7 +315,10 @@ class LoginController extends Controller {
                 continue;
             }
             
+            // now it returns the first item, but it could return
+            // a comma-separated string or any other thing that suits you better
             $attrs[$local_attr] = $ldapuser_attrs[$ldap_attr][0];
+            //$attrs[$local_attr] = implode(',', $ldapuser_attrs[$ldap_attr]);
         }
         
         return $attrs;
