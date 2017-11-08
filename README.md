@@ -18,7 +18,7 @@ As testing environment, we will be using a local Sqlite database and this public
 
 [http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
 
-Tested on 2017-07-11 with Laravel v5.4.28 and Adldap2-Laravel v3.0.4.
+Tested on 2017-11-09 with Laravel v5.5.20 and Adldap2-Laravel v3.0.5.
 
 ### 1. Create a new Laravel project and install Adldap2-Laravel
 
