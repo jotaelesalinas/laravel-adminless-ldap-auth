@@ -70,7 +70,7 @@ Adldap2 kept trying to connect as administrator using the default setup, so I ha
     'default' => [
         'auto_connect' => false,
         'connection' => Adldap\Connections\Ldap::class,
-        'schema' => Adldap\Schemas\ActiveDirectory::class,
+        'schema' => Adldap\Schemas\OpenLDAP::class, // was Adldap\Schemas\ActiveDirectory::class
         'connection_settings' => [
             'account_prefix' => env('ADLDAP_ACCOUNT_PREFIX', ''),
             'account_suffix' => env('ADLDAP_ACCOUNT_SUFFIX', ''),
