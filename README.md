@@ -238,6 +238,9 @@ class LoginController extends Controller {
         $user_format = env('ADLDAP_USER_FORMAT', 'cn=%s,'.env('ADLDAP_BASEDN', ''));
         $userdn = sprintf($user_format, $username);
         
+        // you might need this, as reported in [#14](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/issues/14):
+        // Adldap::auth()->bind($userdn, $password);
+        
         if(Adldap::auth()->attempt($userdn, $password, $bindAsUser = true)) {
             // the user exists in the LDAP server, with the provided password
             
