@@ -262,7 +262,9 @@ class LoginController extends Controller {
                 }
             }
             
-            // by logging the user we create the session so there is no need to login again (in the configured time)
+            // by logging the user we create the session, so there is no need to login again (in the configured time).
+            // pass false as second parameter if you want to force the session to expire when the user closes the browser.
+            // have a look at the section 'session lifetime' in `config/session.php` for more options.
             $this->guard()->login($user, true);
             return true;
         }
