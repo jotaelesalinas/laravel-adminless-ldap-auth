@@ -20,6 +20,8 @@ As testing environment, we will be using a local Sqlite database and this public
 
 Tested on 2017-11-09 with Laravel v5.5.20 and Adldap2-Laravel v3.0.5.
 
+**Disclaimer**: I created this GitHub repo because I faced a very specific problem some time ago and I could not find a solution on the internet. I decided to share the solution I came up with, just in case anyone else stumbled upon the same problem. You can consider this a proof-of-concept. I am really sorry but I can't look into your code or provide solutions to other use cases like Active Directory. That said, if you find a problem with this repo, you are very welcome to open an issue, indicating where exactly the error is, or even better, fix it and send a pull request.
+
 ### 1. Create a new Laravel project and install Adldap2-Laravel
 
 ```bash
