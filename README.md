@@ -120,7 +120,11 @@ public function up()
 }
 ```
 
-### 7. Delete the file `database/migrations/2014_10_12_100000_create_password_resets_table.php`
+### 7. Delete the password resets migration file
+
+```bash
+rm database/migrations/2014_10_12_100000_create_password_resets_table.php
+```
 
 ### 8. Run the migration to create the users table
 
@@ -294,7 +298,7 @@ rm -r resources/views/auth/passwords
 Important note: the proper way to do this is by creating a custom user provider
 ([https://laravel.com/docs/5.7/authentication#adding-custom-user-providers](https://laravel.com/docs/5.7/authentication#adding-custom-user-providers)).
 
-Don't forget the use instructions.
+Don't forget the `use` statements.
 
 ```php
 /* namespace and previous use statements */
@@ -303,7 +307,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Adldap\Laravel\Facades\Adldap;
 
-class LoginController extends Controller {
+class LoginController extends Controller
+{
     /* rest of the class */
 
     // if not added in a previous step
@@ -312,14 +317,16 @@ class LoginController extends Controller {
         return config('ldap_auth.usernames.eloquent');
     }
 
-    protected function validateLogin(Request $request) {
+    protected function validateLogin(Request $request)
+    {
         $this->validate($request, [
             $this->username() => 'required|string|regex:/^\w+$/',
             'password' => 'required|string',
         ]);
     }
 
-    protected function attemptLogin(Request $request) {
+    protected function attemptLogin(Request $request)
+    {
         $credentials = $request->only($this->username(), 'password');
         $username = $credentials[$this->username()];
         $password = $credentials['password'];
@@ -363,7 +370,8 @@ class LoginController extends Controller {
         return false;
     }
 
-    protected function retrieveSyncAttributes($username) {
+    protected function retrieveSyncAttributes($username)
+    {
         $ldapuser = Adldap::search()->where(env('LDAP_USER_ATTRIBUTE'), '=', $username)->first();
         if ( !$ldapuser ) {
             // log error
@@ -419,7 +427,8 @@ class LoginController extends Controller {
         return $attrs;
     }
 
-    protected static function accessProtected ($obj, $prop) {
+    protected static function accessProtected ($obj, $prop)
+    {
         $reflection = new \ReflectionClass($obj);
         $property = $reflection->getProperty($prop);
         $property->setAccessible(true);
