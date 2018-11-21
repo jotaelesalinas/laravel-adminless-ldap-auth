@@ -257,7 +257,7 @@ Route::post('login', 'Auth\LoginController@login');
 Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 ```
 
-### 14. Change 'email' for 'username' in `resources/views/auth/login.blade.php`
+### 14. Replace 'email' with 'username' in `resources/views/auth/login.blade.php`
 
 ```html
 <div class="form-group row">
