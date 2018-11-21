@@ -341,7 +341,7 @@ class LoginController extends Controller
         if(Adldap::auth()->attempt($userdn, $password, $bindAsUser = true)) {
             // the user exists in the LDAP server, with the provided password
 
-            $user = \App\User::where($this->username(), $username) -> first();
+            $user = \App\User::where($this->username(), $username)->first();
             if (!$user) {
                 // the user doesn't exist in the local database, so we have to create one
 
