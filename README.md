@@ -23,7 +23,7 @@ As testing environment, we will be using a local Sqlite database and this public
 
 Tested on 2018-11-20 with Laravel v5.7 and Adldap2-Laravel v5.0.
 
-You can have a look at the [old tutorial for Laravel 5.5 and Adldap-Laravel 3.0](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/blob/4fecf4c94317e27315eb47cf27dfb18567dc13db/README.md).
+If you cannot upgrade to the latest versions, you can have a look at the [old tutorial for Laravel 5.5 and Adldap-Laravel 3.0](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/blob/4fecf4c94317e27315eb47cf27dfb18567dc13db/README.md).
 
 **Disclaimer**: I created this GitHub repo because I faced a very specific problem some time ago and I could not find a solution on the internet. I decided to share the solution I came up with, just in case anyone else stumbled upon the same problem. You can consider this a proof-of-concept. I am really sorry but I can't look into your code or provide solutions to other use cases like Active Directory. That said, if you find a problem with this repo, you are very welcome to open an issue, indicating where exactly the error is, or even better, fix it and send a pull request.
 
