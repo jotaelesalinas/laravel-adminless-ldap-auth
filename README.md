@@ -21,9 +21,9 @@ As testing environment, we will be using a local Sqlite database and this public
 
 [http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
 
-Tested on 2018-11-20 with Laravel v5.7 and Adldap2-Laravel v5.0.
+Tested on 2019-10-25 with Laravel v6.2 and Adldap2-Laravel v6.0.
 
-If you cannot upgrade to the latest versions, you can have a look at the [old tutorial for Laravel 5.5 and Adldap-Laravel 3.0](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/blob/4fecf4c94317e27315eb47cf27dfb18567dc13db/README.md).
+If you cannot upgrade to the latest versions, you can have a look at the old tutorials for [Laravel 5.5 and Adldap-Laravel 3.0](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/blob/4fecf4c94317e27315eb47cf27dfb18567dc13db/README.md) or [Laravel 5.7 and Adldap-Laravel 6.0](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/blob/56fa7c0f46c16cd4a97a11fbf75781f1beedf213/README.md).
 
 **Disclaimer**: I created this GitHub repo because I faced a very specific problem some time ago and I could not find a solution on the internet. I decided to share the solution I came up with, just in case anyone else stumbled upon the same problem. You can consider this a proof-of-concept. I am really sorry but I can't look into your code or provide solutions to other use cases like Active Directory. That said, if you find a problem with this repo, you are very welcome to open an issue, indicating where exactly the error is, or even better, fix it and send a pull request.
 
@@ -35,23 +35,17 @@ cd laravel-simple-ldap-auth
 composer require adldap2/adldap2-laravel
 ```
 
-### 2. Register Adldap's service providers and façade in `config/app.php`
+### 2. Register Adldap's façade in `config/app.php`
 
 ```php
-'providers' => [
-    // already existing providers
-
-    // Only required for Laravel 5.0-5.4. Automatically registered in Laravel 5.5+.
-    Adldap\Laravel\AdldapServiceProvider::class,
-    Adldap\Laravel\AdldapAuthServiceProvider::class,
-],
-
 'aliases' => [
     // already existing façade aliases
 
     'Adldap' => Adldap\Laravel\Facades\Adldap::class,
 ],
 ```
+
+Since Laravel 5.5 you don't need to add the service providers.
 
 ### 3. Publish Adldap service providers
 
@@ -176,32 +170,21 @@ php artisan migrate
 ### 10. Configure the LDAP authentication in `config/ldap_auth.php`
 
 ```php
-'usernames' => [
-
+'identifiers' => [
     'ldap' => [
-
-        // replace this line:
-        // 'discover' => 'userprincipalname',
-        // with this one:
-        'discover' => env('LDAP_USER_ATTRIBUTE', 'userprincipalname'),
-
-        // replace this line:
-        // 'authenticate' => 'distinguishedname',
-        // with this one:
-        'authenticate' => env('LDAP_USER_ATTRIBUTE', 'distinguishedname'),
-
+        'locate_users_by' => env('LDAP_USER_ATTRIBUTE', 'userprincipalname'),
+        'bind_users_by' => env('LDAP_USER_ATTRIBUTE', 'distinguishedname'),
     ],
 
-    // replace this line:
-    // 'eloquent' => 'email',
-    // with this one:
-    'eloquent' => 'username',
-
+    'database' => [
+        'guid_column' => 'objectguid',
+        'username_column' => 'username',
+    ],
 ],
 
 'sync_attributes' => [
     // 'field_in_local_db' => 'attribute_in_ldap_server',
-    'username' => 'uid', // was 'email' => 'userprincipalname',
+    'username' => 'uid',
     'name' => 'cn',
     'phone' => 'telephonenumber',
 ],
@@ -210,26 +193,11 @@ php artisan migrate
 ### 11. Scaffold login controllers and routes
 
 ```bash
-php artisan make:auth
+composer require laravel/ui
+php artisan ui vue --auth
 ```
 
 ### 12. Tell Laravel that users are identified by username instead of email address
-
-#### Laravel up to 5.2.*
-
-Inside the file `app/Http/Controllers/Auth/AuthController.php`,
-you'll need to add the protected `$username` property.
-
-```php
-class AuthController extends Controller
-{
-    protected $username = 'username';
-
-    /* rest of the class */
-}
-```
-
-#### Laravel 5.3+
 
 Inside the file `app/Http/Controllers/Auth/LoginController.php`,
 you'll need to add the public method `username()`:
@@ -241,7 +209,15 @@ class LoginController extends Controller
 
     public function username()
     {
-        return config('ldap_auth.usernames.eloquent');
+        // we could return config('ldap_auth...') directly
+        // but it seems to change a lot and with this check we make sure
+        // that it will fail in future versions, if changed.
+        // you can return the config(...) directly if you want.
+        $column_name = config('ldap_auth.identifiers.database.username_column', null);
+        if ( !$column_name ) {
+            die('Error in LoginController::username(): could not find username column.');
+        }
+        return $column_name;
     }
 }
 ```
@@ -263,29 +239,24 @@ Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
 ```html
 <div class="form-group row">
-    <label for="username" class="col-sm-4 col-form-label text-md-right">{{ __('Username') }}</label>
+    <label for="username" class="col-md-4 col-form-label text-md-right">{{ __('Username') }}</label>
+
     <div class="col-md-6">
-        <input id="username" type="username" class="form-control{{ $errors->has('username') ? ' is-invalid' : '' }}" name="username" value="{{ old('username') }}" required autofocus>
-        @if ($errors->has('username'))
+        <input id="username" type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autocomplete="username" autofocus>
+
+        @error('username')
             <span class="invalid-feedback" role="alert">
-                <strong>{{ $errors->first('username') }}</strong>
+                <strong>{{ $message }}</strong>
             </span>
-        @endif
+        @enderror
     </div>
 </div>
-```
-
-And remove these lines:
-
-```html
-<a class="btn btn-link" href="{{ route('password.request') }}">
-    {{ __('Forgot Your Password?') }}
-</a>
 ```
 
 ### 15. Delete the following files and folder
 
 ```bash
+rm app/Http/Controllers/Auth/ConfirmPasswordController.php
 rm app/Http/Controllers/Auth/ForgotPasswordController.php
 rm app/Http/Controllers/Auth/RegisterController.php
 rm app/Http/Controllers/Auth/ResetPasswordController.php
@@ -311,21 +282,7 @@ use Adldap\Laravel\Facades\Adldap;
 
 class LoginController extends Controller
 {
-    /* rest of the class */
-
-    // if not added in a previous step
-    public function username()
-    {
-        return config('ldap_auth.usernames.eloquent');
-    }
-
-    protected function validateLogin(Request $request)
-    {
-        $this->validate($request, [
-            $this->username() => 'required|string|regex:/^\w+$/',
-            'password' => 'required|string',
-        ]);
-    }
+    /* rest of the class, including the previously added username() */
 
     protected function attemptLogin(Request $request)
     {
