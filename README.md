@@ -37,7 +37,7 @@ If you cannot upgrade to the latest versions, you can have a look at the old tut
 ### Create a new Laravel project
 
 ```bash
-composer create-project laravel/laravel adminless
+composer create-project laravel/laravel adminless && \
 cd adminless
 ```
 
@@ -52,6 +52,12 @@ composer require jotaelesalinas/laravel-simple-ldap-auth
 ```bash
 LOGIN_FIELD=username
 ```
+
+This has nothing to do with your "key username field" in the LDAP server.
+You should use either `username` or `email` for the sake of clarity,
+but it doesn't really make a difference. E.g. your key field in the LDAP
+server could be `phonenumber`, and it would still work with `username` here.
+But it just doesn't feel right, I know.
 
 ### Modify `config/auth.php`
 
@@ -89,8 +95,10 @@ Create this new entry:
 
 ### Publish the config files of Adldap and AdldapAuth
 
-php artisan vendor:publish --provider="Adldap\Laravel\AdldapServiceProvider"
+```bash
+php artisan vendor:publish --provider="Adldap\Laravel\AdldapServiceProvider" && \
 php artisan vendor:publish --provider="Adldap\Laravel\AdldapAuthServiceProvider"
+```
 
 ### Add LDAP configuration options to `.env`
 
@@ -105,11 +113,16 @@ LDAP_HOSTS=ldap.forumsys.com                 # Your LDAP server
 LDAP_BASE_DN=dc=example,dc=com               # base distinguished name
 LDAP_USER_ATTRIBUTE=uid                      # field by which your users are
                                              # identified in the LDAP server
-LDAP_USER_FORMAT=uid=%s,dc=example,dc=com    # full user distinguished name
+LDAP_USER_FORMAT=${LDAP_USER_ATTRIBUTE}=%s,${LDAP_BASE_DN}
+                                             # full user distinguished name
                                              # to be used with sprintf,
 LDAP_CONNECTION=default                      # which configuration to use
                                              # from config/ldap.php
 ```
+
+This is where you have to enter the proper "key username field" by which users are identified
+in you LDAP server. In this case, it is `uid`, and you have to enter it in `LDAP_USER_ATTRIBUTE`
+and maybe `LDAP_USER_FORMAT`.
 
 ### Configure the LDAP connection in `config/ldap.php`
 
@@ -164,6 +177,8 @@ Tell the Adldap library by which field users are to be located:
 
 ```php
 'identifiers' => [
+    // ... other code ...
+
     'ldap' => [
         'locate_users_by' => env('LDAP_USER_ATTRIBUTE', 'userprincipalname'),
         'bind_users_by' => env('LDAP_USER_ATTRIBUTE', 'distinguishedname'),
@@ -173,6 +188,8 @@ Tell the Adldap library by which field users are to be located:
             'guid_column' => 'objectguid',
             'username_column' => env('LOGIN_FIELD', null),
     ],
+
+    // ... other code ...
 ],
 ```
 
@@ -191,8 +208,8 @@ want "imported" into your User model _on every sucessful login_.
 ### Create the auth routes, controllers and views
 
 ```bash
-composer require laravel/ui
-php artisan ui vue --auth
+composer require laravel/ui && \
+php artisan ui vue --auth && \
 npm install && npm run dev
 ```
 
@@ -200,17 +217,17 @@ npm install && npm run dev
 
 ```bash
 # user migration
-rm database/migrations/2014_10_12_000000_create_users_table.php
+rm database/migrations/2014_10_12_000000_create_users_table.php && \
 # password reset migration
-rm database/migrations/2014_10_12_100000_create_password_resets_table.php
+rm database/migrations/2014_10_12_100000_create_password_resets_table.php && \
 # unnecessary auth controllers and views
-rm app/Http/Controllers/Auth/ConfirmPasswordController.php
-rm app/Http/Controllers/Auth/ForgotPasswordController.php
-rm app/Http/Controllers/Auth/RegisterController.php
-rm app/Http/Controllers/Auth/ResetPasswordController.php
-rm app/Http/Controllers/Auth/VerificationController.php
-rm resources/views/auth/register.blade.php
-rm resources/views/auth/verify.blade.php
+rm app/Http/Controllers/Auth/ConfirmPasswordController.php && \
+rm app/Http/Controllers/Auth/ForgotPasswordController.php && \
+rm app/Http/Controllers/Auth/RegisterController.php && \
+rm app/Http/Controllers/Auth/ResetPasswordController.php && \
+rm app/Http/Controllers/Auth/VerificationController.php && \
+rm resources/views/auth/register.blade.php && \
+rm resources/views/auth/verify.blade.php && \
 rm -r resources/views/auth/passwords
 ```
 
@@ -223,7 +240,7 @@ rm -r resources/views/auth/passwords
 Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
 Route::post('logout', 'Auth\LoginController@logout')->name('logout');
-// If you want to be able to log out from the address bar during development:
+// If you want to be able to log out from the /logout URL, e.g. during development:
 Route::get('logout', 'Auth\LoginController@logout');
 ```
 
@@ -313,6 +330,8 @@ With:
 
 (Don't leave blank spaces before the JSON to get nicer results.)
 
+Remember that, as usual with Laravel, you can always access you current user's data via `Auth::user()`.
+
 ### Set your URL in `.env`
 
 ```bash
@@ -338,7 +357,7 @@ Visit <http://localhost:8000> in your favourite browser.
 Try to visit <http://localhost:8000/home> before logging in. You should be redirected to the login page.
 
 Remember that you have these users available in the testing LDAP server:
-`riemann`, `gauss`, `euler`, `euclid`, `einstein`, `newton`, `galieleo` and `tesla`.
+`riemann`, `gauss`, `euler`, `euclid`, `einstein`, `newton` and `tesla`.
 The password is `password` for all of them.
 
 Log in and play around.
@@ -348,7 +367,7 @@ Was this article useful? Give it a star!
 #### To do
 
 - [x] Upload to packagist
-- [ ] Set up the GitHub Hook for Packagist <https://packagist.org/about#how-to-update-packages>
+- [x] Set up the GitHub Hook for Packagist <https://packagist.org/about#how-to-update-packages>
 - [ ] Do we have to trigger events for login attempts, success, failure, logout, etcc? Or are they triggered somewhere else?
 - [ ] Instructions for ActiveDirectory -- help needed, I don't have access to any AD server
 - [ ] Tests
