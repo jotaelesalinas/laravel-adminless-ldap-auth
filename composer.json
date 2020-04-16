@@ -1,6 +1,6 @@
 {
     "type": "package",
-    "name": "jotaelesalinas/laravel-adminless-ldap-auth",
+    "name": "jotaelesalinas/laravel-simple-ldap-auth",
     "description": "Authenticate users in Laravel against an adminless LDAP server",
     "homepage": "https://github.com/jotaelesalinas/laravel-adminless-ldap-auth",
     "authors": [
