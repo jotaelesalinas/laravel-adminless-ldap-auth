@@ -1,0 +1,56 @@
+{
+    "type": "package",
+    "name": "jotaelesalinas/laravel-adminless-ldap-auth",
+    "description": "Authenticate users in Laravel against an adminless LDAP server",
+    "homepage": "https://github.com/jotaelesalinas/laravel-adminless-ldap-auth",
+    "authors": [
+        {
+            "name": "José Luis Salinas",
+            "email": "jotaelesalinas@example.com",
+            "homepage": "https://github.com/jotaelesalinas",
+            "role": "Developer"
+        }
+    ],
+    "keywords": [
+        "laravel",
+        "simple",
+        "ldap",
+        "auth",
+        "openldap",
+        "active directory",
+        "ad",
+        "adminless",
+        "no admin",
+        "login"
+    ],
+    "require": {
+        "php": ">=7.0",
+        "adldap2/adldap2-laravel": ">=6.0"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.0",
+        "orchestra/testbench": "^4.0|^5.0",
+        "phpunit/phpunit": "^8.3|^9.0",
+        "vlucas/phpdotenv": "^3.3|^4.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "JotaEleSalinas\\AdminlessLdap\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JotaEleSalinas\\AdminlessLdap\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "JotaEleSalinas\\AdminlessLdap\\AdminlessLdapServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
