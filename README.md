@@ -347,7 +347,7 @@ Was this article useful? Give it a star!
 
 #### To do
 
-- [ ] Upload to packagist
+- [x] Upload to packagist
 - [ ] Set up the GitHub Hook for Packagist <https://packagist.org/about#how-to-update-packages>
 - [ ] Do we have to trigger events for login attempts, success, failure, logout, etcc? Or are they triggered somewhere else?
 - [ ] Instructions for ActiveDirectory -- help needed, I don't have access to any AD server
