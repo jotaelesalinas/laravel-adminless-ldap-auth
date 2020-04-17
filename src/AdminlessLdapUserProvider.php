@@ -156,9 +156,10 @@ class AdminlessLdapUserProvider implements UserProvider
             throw new \Exception('AdminlessLdapUserProvider: missing config "auth.key_user_field".');
         }
 
-        $username = $credentials[config('auth.key_user_field')];
-
-        if ( $user->username !== $username ) {
+        $keyfield = config('auth.key_user_field');
+        $username = $credentials[$keyfield];
+        
+        if ( $user->$keyfield !== $username ) {
             return false;
         }
 
