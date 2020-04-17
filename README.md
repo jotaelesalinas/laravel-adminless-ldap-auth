@@ -205,7 +205,7 @@ That's it! Now you should be able to use
 [Laravel's built-in authentication](https://laravel.com/docs/7.x/authentication#included-authenticating)
 to perform all auth-related tasks, e.g. `Auth::check()`, `Auth::attempt()`, `Auth::user()`, etc.
 
-You can try now:
+You can try with tinker:
 
 ```bash
 php artisan optimize:clear && \
@@ -213,16 +213,28 @@ php artisan tinker
 ```
 
 ```php
-Auth::check() // false
-Auth::user() // null
-Auth::attempt(['id' => 'einstein', 'password' => 'password']);
-Auth::check();
-Auth::user();
+Auth::check()   // false
+Auth::guest()   // true
+Auth::user()    // null
+
+Auth::attempt(['id' => 'einstein', 'password' => 'qwerty'])
+                // false
+                // will show a warning with the failed LDAP binding
+Auth::attempt(['id' => 'einstein', 'password' => 'password'])
+                // true
+                // might issue a warning about the session storage. just ignore it.
+
+Auth::check()   // true
+Auth::guest()   // false
+Auth::user()    // dump of your User model
+
+exit
 ```
 
 ## Auth UI scaffold
 
-Laravel provides an amazing scaffold for authentication, and here's how you can use it.
+You can build your login system around `Auth`, but as you already probably know,
+Laravel provides an amazing scaffold for authentication. Here's how you can use it.
 
 ### Create the auth routes, controllers and views
 
