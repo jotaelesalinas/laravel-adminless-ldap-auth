@@ -52,10 +52,10 @@ composer require jotaelesalinas/laravel-simple-ldap-auth
 ### Add users' login field to `.env`
 
 ```bash
-LOGIN_FIELD=id
+LOCAL_USER_KEY_FIELD=id
 ```
 
-You can change the value of `LOGIN_FIELD` to whatever you want, e.g. `username`, `email` or `phonenumber`,
+You can change the value of `LOCAL_USER_KEY_FIELD` to whatever you want, e.g. `username`, `email` or `phonenumber`,
 but you don't really have to.
 
 ### Modify `config/auth.php`
@@ -89,7 +89,7 @@ Delete the `api` guard if you dont need it. Or at least comment it out.
 Create this new entry:
 
 ```php
-'login_field' => env('LOGIN_FIELD', null),
+'key_user_field' => env('LOCAL_USER_KEY_FIELD', null),
 ```
 
 ### Publish the config files of Adldap and AdldapAuth
@@ -193,7 +193,7 @@ want "imported" into your User model _on every sucessful login_.
 ```php
 'sync_attributes' => [
     // 'field_in_user_model' => 'attribute_in_ldap_server',
-    env('LOGIN_FIELD', null) => 'uid',
+    env('LOCAL_USER_KEY_FIELD', null) => 'uid',
     'name' => 'cn',
     'phone' => 'telephonenumber',
 ],
@@ -257,32 +257,32 @@ class LoginController extends Controller
 
     public function username()
     {
-        return config('auth.login_field');
+        return config('auth.key_user_field');
     }
 }
 ```
 
 ### Adapt login form in `resources/views/auth/login.blade.php`
 
-Change `email` to `config('auth.login_field')` (HTML code might change in the future):
+Change `email` to `config('auth.key_user_field')` (HTML code might change in the future):
 
 ```html
 <div class="form-group row">
-    <label for="{{ config('auth.login_field') }}"
+    <label for="{{ config('auth.key_user_field') }}"
            class="col-md-4 col-form-label text-md-right"
         >{{ __('Username') }}</label>
 
     <div class="col-md-6">
-        <input id="{{ config('auth.login_field') }}"
+        <input id="{{ config('auth.key_user_field') }}"
                type="text"
-               class="form-control @error(config('auth.login_field')) is-invalid @enderror"
-               name="{{ config('auth.login_field') }}"
-               value="{{ old(config('auth.login_field')) }}"
+               class="form-control @error(config('auth.key_user_field')) is-invalid @enderror"
+               name="{{ config('auth.key_user_field') }}"
+               value="{{ old(config('auth.key_user_field')) }}"
                required
-               autocomplete="{{ config('auth.login_field') }}"
+               autocomplete="{{ config('auth.key_user_field') }}"
                autofocus>
 
-        @error(config('auth.login_field'))
+        @error(config('auth.key_user_field'))
             <span class="invalid-feedback" role="alert">
                 <strong>{{ $message }}</strong>
             </span>

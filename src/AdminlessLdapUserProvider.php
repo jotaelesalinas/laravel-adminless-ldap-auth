@@ -15,11 +15,11 @@ class AdminlessLdapUserProvider implements UserProvider
      */
     public function retrieveById($identifier)
     {
-        if ( !config('auth.login_field') ) {
-            throw new \Exception('AdminlessLdapUserProvider: missing config "auth.login_field".');
+        if ( !config('auth.key_user_field') ) {
+            throw new \Exception('AdminlessLdapUserProvider: missing config "auth.key_user_field".');
         }
 
-        return $this->retrieveByCredentials([config('auth.login_field') => $identifier]);
+        return $this->retrieveByCredentials([config('auth.key_user_field') => $identifier]);
     }
 
     /**
@@ -52,11 +52,11 @@ class AdminlessLdapUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if ( !config('auth.login_field') ) {
-            throw new \Exception('AdminlessLdapUserProvider: missing config "auth.login_field".');
+        if ( !config('auth.key_user_field') ) {
+            throw new \Exception('AdminlessLdapUserProvider: missing config "auth.key_user_field".');
         }
 
-        $username_field = config('auth.login_field');
+        $username_field = config('auth.key_user_field');
 
         $username = $credentials[$username_field];
         $password = ''; //$credentials['password'];
@@ -96,7 +96,7 @@ class AdminlessLdapUserProvider implements UserProvider
         $ldapuser_attrs = null;
 
         foreach (config('ldap_auth.sync_attributes', []) as $local_attr => $ldap_attr) {
-            if ( $local_attr == config('auth.login_field') ) {
+            if ( $local_attr == config('auth.key_user_field') ) {
                 continue;
             }
 
@@ -152,11 +152,11 @@ class AdminlessLdapUserProvider implements UserProvider
      */
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
-        if ( !config('auth.login_field') ) {
-            throw new \Exception('AdminlessLdapUserProvider: missing config "auth.login_field".');
+        if ( !config('auth.key_user_field') ) {
+            throw new \Exception('AdminlessLdapUserProvider: missing config "auth.key_user_field".');
         }
 
-        $username = $credentials[config('auth.login_field')];
+        $username = $credentials[config('auth.key_user_field')];
 
         if ( $user->username !== $username ) {
             return false;

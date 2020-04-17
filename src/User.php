@@ -15,7 +15,7 @@ class User extends IntermediateUser implements Authenticatable
     protected $rememberTokenName = '';
     
     public function getKeyName () {
-        $column_name = config('auth.login_field', null);
+        $column_name = config('auth.key_user_field', null);
         if ( !$column_name ) {
             throw new \Exception('AdminlessLdapUser: Could not find keyName.');
         }
