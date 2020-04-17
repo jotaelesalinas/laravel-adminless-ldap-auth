@@ -34,7 +34,9 @@ If you cannot upgrade to the latest versions, you can have a look at the old tut
 
 **Important**: I do not provide support. This software is offered as-is. Use it at your own risk.
 
-### Create a new Laravel project
+## Installation
+
+### Create a new Laravel project, if needed
 
 ```bash
 composer create-project laravel/laravel adminless && \
@@ -50,14 +52,11 @@ composer require jotaelesalinas/laravel-simple-ldap-auth
 ### Add users' login field to `.env`
 
 ```bash
-LOGIN_FIELD=username
+LOGIN_FIELD=id
 ```
 
-This has nothing to do with your "key username field" in the LDAP server.
-You should use either `username` or `email` for the sake of clarity,
-but it doesn't really make a difference. E.g. your key field in the LDAP
-server could be `phonenumber`, and it would still work with `username` here.
-But it just doesn't feel right, I know.
+You can change the value of `LOGIN_FIELD` to whatever you want, e.g. `username`, `email` or `phonenumber`,
+but you don't really have to.
 
 ### Modify `config/auth.php`
 
@@ -120,9 +119,8 @@ LDAP_CONNECTION=default                      # which configuration to use
                                              # from config/ldap.php
 ```
 
-This is where you have to enter the proper "key username field" by which users are identified
-in you LDAP server. In this case, it is `uid`, and you have to enter it in `LDAP_USER_ATTRIBUTE`
-and maybe `LDAP_USER_FORMAT`.
+Bear in mind that `LDAP_USER_FORMAT` is composed of the two previous values, for this
+specific setup. You might need to modify it as well.
 
 ### Configure the LDAP connection in `config/ldap.php`
 
@@ -166,6 +164,7 @@ Again, you will need the assistance of your LDAP administrator. See comments bel
             'follow_referrals' => env('LDAP_FOLLOW_REFERRALS', false),
             'use_ssl' => env('LDAP_USE_SSL', false),
             'use_tls' => env('LDAP_USE_TLS', false),
+
         ],
     ],
 ],
@@ -173,7 +172,7 @@ Again, you will need the assistance of your LDAP administrator. See comments bel
 
 ### Configure the LDAP authentication in `config/ldap_auth.php`
 
-Tell the Adldap library by which field users are to be located:
+Tell the Adldap library which field uniquely identifies the users in your LDAP server:
 
 ```php
 'identifiers' => [
@@ -182,11 +181,6 @@ Tell the Adldap library by which field users are to be located:
     'ldap' => [
         'locate_users_by' => env('LDAP_USER_ATTRIBUTE', 'userprincipalname'),
         'bind_users_by' => env('LDAP_USER_ATTRIBUTE', 'distinguishedname'),
-    ],
-
-    'database' => [
-            'guid_column' => 'objectguid',
-            'username_column' => env('LOGIN_FIELD', null),
     ],
 
     // ... other code ...
@@ -204,6 +198,16 @@ want "imported" into your User model _on every sucessful login_.
     'phone' => 'telephonenumber',
 ],
 ```
+
+## Usage
+
+That's it! Now you should be able to use
+[Laravel's built-in authentication](https://laravel.com/docs/7.x/authentication#included-authenticating)
+to perform all auth-related tasks, e.g. `Auth::check()`, `Auth::attempt()`, `Auth::user()`, etc.
+
+## Auth UI scaffold
+
+Laravel provides an amazing scaffold for authentication, and here's how you can use it.
 
 ### Create the auth routes, controllers and views
 
@@ -260,25 +264,25 @@ class LoginController extends Controller
 
 ### Adapt login form in `resources/views/auth/login.blade.php`
 
-Change `email` to `username` if you need it (specific HTML code might change in the future):
+Change `email` to `config('auth.login_field')` (HTML code might change in the future):
 
 ```html
 <div class="form-group row">
-    <label for="username"
+    <label for="{{ config('auth.login_field') }}"
            class="col-md-4 col-form-label text-md-right"
         >{{ __('Username') }}</label>
 
     <div class="col-md-6">
-        <input id="username"
+        <input id="{{ config('auth.login_field') }}"
                type="text"
-               class="form-control @error('username') is-invalid @enderror"
-               name="username"
-               value="{{ old('username') }}"
+               class="form-control @error(config('auth.login_field')) is-invalid @enderror"
+               name="{{ config('auth.login_field') }}"
+               value="{{ old(config('auth.login_field')) }}"
                required
-               autocomplete="username"
+               autocomplete="{{ config('auth.login_field') }}"
                autofocus>
 
-        @error('username')
+        @error(config('auth.login_field'))
             <span class="invalid-feedback" role="alert">
                 <strong>{{ $message }}</strong>
             </span>
@@ -287,11 +291,8 @@ Change `email` to `username` if you need it (specific HTML code might change in 
 </div>
 ```
 
-We hardcoded `username` instead of using `{{ config('auth.login_field')}}` because
-it is something that will (or should) not change in the future.
-
-Now, delete the "Remember me" checkbox, because there is no "Remember me" with this system.
-Remove this whole form group (specific HTML markup could change in the future):
+Now, delete the "Remember me" checkbox, because we will have no such functionality.
+Remove this whole form group (HTML markup could change in the future):
 
 ```html
 <div class="form-group row">
@@ -313,26 +314,24 @@ Modify `resources/views/home.blade.php`:
 Change the line:
 
 ```html
-    You are logged in!
+You are logged in!
 ```
 
 With:
 
 ```html
-    <p>You are logged in!</p>
+<p>You are logged in!</p>
 
-    <p>Your user data:</p>
+<p>Your user data:</p>
 
-    <pre>
+<pre>
 {{ json_encode(Auth::user(), JSON_PRETTY_PRINT) }}
-    </pre>
+</pre>
 ```
 
-(Don't leave blank spaces before the JSON to get nicer results.)
+### Final touches
 
-Remember that, as usual with Laravel, you can always access you current user's data via `Auth::user()`.
-
-### Set your URL in `.env`
+Set your URL in `.env`:
 
 ```bash
 APP_URL=http://localhost:8000
@@ -364,7 +363,7 @@ Log in and play around.
 
 Was this article useful? Give it a star!
 
-#### To do
+## To do
 
 - [x] Upload to packagist
 - [x] Set up the GitHub Hook for Packagist <https://packagist.org/about#how-to-update-packages>
