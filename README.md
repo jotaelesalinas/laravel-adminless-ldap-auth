@@ -205,6 +205,21 @@ That's it! Now you should be able to use
 [Laravel's built-in authentication](https://laravel.com/docs/7.x/authentication#included-authenticating)
 to perform all auth-related tasks, e.g. `Auth::check()`, `Auth::attempt()`, `Auth::user()`, etc.
 
+You can try now:
+
+```bash
+php artisan optimize:clear && \
+php artisan tinker
+```
+
+```php
+Auth::check() // false
+Auth::user() // null
+Auth::attempt(['id' => 'einstein', 'password' => 'password']);
+Auth::check();
+Auth::user();
+```
+
 ## Auth UI scaffold
 
 Laravel provides an amazing scaffold for authentication, and here's how you can use it.
