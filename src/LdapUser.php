@@ -6,11 +6,12 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use \Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 
 // very ugly hack to be able to override $rememberTokenName
-abstract class IntermediateUser {
+// (it is inside a trait, that is why we cannot override it dierectly)
+abstract class IntermediateLdapUser {
     use AuthenticatableTrait;
 }
 
-class User extends IntermediateUser implements Authenticatable
+class LdapUser extends IntermediateLdapUser implements Authenticatable
 {
     protected $rememberTokenName = '';
     

@@ -66,7 +66,7 @@ class AdminlessLdapUserProvider implements UserProvider
             return null;
         }
 
-        $user = new User();
+        $user = new LdapUser();
         $user->$username_field = $username;
         foreach ($sync_attrs as $field => $value) {
             $user->$field = $value !== null ? $value : '';
@@ -88,8 +88,9 @@ class AdminlessLdapUserProvider implements UserProvider
             return null;
         }
         // if you want to see the list of available attributes in your specific LDAP server:
-        // var_dump($ldapuser->attributes); exit;
-
+        // dd($ldapuser);
+        // and look for `attributes` (protected)
+        
         // needed if any attribute is not directly accessible via a method call.
         // attributes in \Adldap\Models\User are protected, so we will need
         // to retrieve them using reflection.

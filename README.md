@@ -23,7 +23,7 @@ As testing environment, we will be using this publicly available testing LDAP se
 
 [http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
 
-Tested on 2020-04-16 with Laravel v7.0 and Adldap2-Laravel v6.0.
+Tested on 2020-04-16 with Laravel v7.6 and Adldap2-Laravel v6.0.
 
 If you cannot upgrade to the latest versions, you can have a look at the old tutorials for:
 - [Laravel 6.2 and Adldap2-Laravel 6.0](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/blob/d26ea52ddcc9a1336eb49a9c01469f51f8c83165/README.md)
@@ -192,7 +192,7 @@ want "imported" into your User model _on every sucessful login_.
 
 ```php
 'sync_attributes' => [
-    // 'field_in_user_model' => 'attribute_in_ldap_server',
+    // 'field_in_local_user_model' => 'attribute_in_ldap_server',
     env('LOCAL_USER_KEY_FIELD', null) => 'uid',
     'name' => 'cn',
     'phone' => 'telephonenumber',
