@@ -19,7 +19,7 @@ checking if a user exists and the password is correct.
 In my case I didn't have any available admin user in the LDAP server, so I had to adapt the library
 default behaviour to this specific use case.
 
-As testing environment, we will be using a local Sqlite database and this publicly available testing LDAP server:
+As testing environment, we will be using this publicly available testing LDAP server:
 
 [http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
 
