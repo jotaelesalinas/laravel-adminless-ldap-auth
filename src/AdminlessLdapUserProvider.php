@@ -33,9 +33,9 @@ class AdminlessLdapUserProvider implements UserProvider
 
     public function retrieveByCredentials(array $credentials)
     {
-        $username = $credentials[LdapUser::keyName()];
+        $identifier = $credentials[LdapUser::keyName()];
         
-        $userdata = $this->ldap_helper->retrieveUser($username);
+        $userdata = $this->ldap_helper->retrieveUser($identifier);
         if ( !$userdata ) {
             return null;
         }
@@ -46,14 +46,14 @@ class AdminlessLdapUserProvider implements UserProvider
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
         $keyfield = LdapUser::keyName();
-        $username = $credentials[$keyfield];
+        $identifier = $credentials[$keyfield];
         
-        if ( $user->$keyfield !== $username ) {
+        if ( $user->$keyfield !== $identifier ) {
             return false;
         }
 
         $password = $credentials['password'];
 
-        return $this->ldap_helper->bind($username, $password);
+        return $this->ldap_helper->bind($identifier, $password);
     }
 }
