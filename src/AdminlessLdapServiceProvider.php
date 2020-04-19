@@ -20,7 +20,7 @@ class AdminlessLdapServiceProvider extends ServiceProvider {
         //);
 
         Auth::provider('adminless_ldap', function($app, array $config) {
-            return new AdminlessLdapUserProvider();
+            return new AdminlessLdapUserProvider(new LdapHelper($config));
         });
     }
 

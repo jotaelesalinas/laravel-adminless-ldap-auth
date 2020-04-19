@@ -181,6 +181,7 @@ Tell the Adldap library which field uniquely identifies the users in your LDAP s
     'ldap' => [
         'locate_users_by' => env('LDAP_USER_ATTRIBUTE', 'userprincipalname'),
         'bind_users_by' => env('LDAP_USER_ATTRIBUTE', 'distinguishedname'),
+        'user_format' => env('LDAP_USER_FORMAT', ''),
     ],
 
     // ... other code ...
