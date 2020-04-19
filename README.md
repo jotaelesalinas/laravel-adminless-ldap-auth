@@ -228,8 +228,7 @@ Auth::attempt(['id' => 'einstein', 'password' => 'password'])
 Auth::check()   // true
 Auth::guest()   // false
 Auth::user()    // dump of your User model
-
-exit
+Auth::id()      // "einstein"
 ```
 
 ## Auth UI scaffold
