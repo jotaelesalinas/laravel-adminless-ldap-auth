@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace JotaEleSalinas\AdminlessLdap;
 
@@ -10,30 +11,34 @@ class LdapHelper
     protected $user_full_dn_fmt = null;
     protected $sync_attributes = null;
 
-    function __construct ($config) {
+    // Makes sure that the needed config options exist and caches them
+    public function __construct(array $config)
+    {
         $this->user_key = config('ldap_auth.identifiers.ldap.locate_users_by', null);
-        if ( !$this->user_key ) {
+        if (!$this->user_key) {
             throw new \Exception('LdapHelper: missing config "ldap_auth.identifiers.ldap.locate_users_by".');
         }
 
         $this->user_full_dn_fmt = config('ldap_auth.identifiers.ldap.user_format', null);
-        if ( !$this->user_full_dn_fmt ) {
+        if (!$this->user_full_dn_fmt) {
             throw new \Exception('LdapHelper: missing config "ldap_auth.identifiers.ldap.user_format".');
         }
 
         $this->sync_attributes = config('ldap_auth.sync_attributes', []);
     }
 
-    public function retrieveUser (string $identifier) {
+    // Retrieves an LDAP user by identifier, no password checking yet
+    public function retrieveUser(string $identifier) : ?array
+    {
         $ldapuser = Adldap::search()->where($this->user_key, '=', $identifier)->first();
-        if ( !$ldapuser ) {
+        if (!$ldapuser) {
             // log error
             return null;
         }
         // if you want to see the list of available attributes in your specific LDAP server:
         // dd($ldapuser);
         // and look for `attributes` (protected)
-        
+
         $attrs = [];
 
         // needed if any attribute is not directly accessible via a method call.
@@ -77,7 +82,8 @@ class LdapHelper
         return $attrs;
     }
 
-    protected static function accessProtected ($obj, $prop)
+    // Access to protected properties from the Adldap2 object
+    protected static function accessProtected($obj, $prop)
     {
         $reflection = new \ReflectionClass($obj);
         $property = $reflection->getProperty($prop);
@@ -85,7 +91,9 @@ class LdapHelper
         return $property->getValue($obj);
     }
 
-    public function bind (string $identifier, string $password) {
+    // Binds a user to the LDAP server, efectively checking if identifier and password match
+    public function checkCredentials(string $identifier, string $password) : bool
+    {
         $userdn = sprintf($this->user_full_dn_fmt, $identifier);
 
         // you might need this, as reported in

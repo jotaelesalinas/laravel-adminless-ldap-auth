@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace JotaEleSalinas\AdminlessLdap;
 
@@ -9,7 +10,7 @@ class AdminlessLdapUserProvider implements UserProvider
 {
     protected $ldap_helper = null;
 
-    function __construct (LdapHelper $ldap_helper)
+    public function __construct(LdapHelper $ldap_helper)
     {
         $this->ldap_helper = $ldap_helper;
     }
@@ -21,39 +22,42 @@ class AdminlessLdapUserProvider implements UserProvider
 
     public function retrieveByToken($identifier, $token)
     {
-        // Get and return a user by their unique identifier and "remember me" token
         throw new \Exception('AdminlessLdapUserProvider: Not possible to use "remember me" tokens.');
     }
 
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        // Save the given "remember me" token for the given user
         throw new \Exception('AdminlessLdapUserProvider: Not possible to use "remember me" tokens.');
     }
 
-    public function retrieveByCredentials(array $credentials)
+    public function retrieveByCredentials(array $credentials) : ?Authenticatable
     {
-        $identifier = $credentials[LdapUser::keyName()];
-        
-        $userdata = $this->ldap_helper->retrieveUser($identifier);
-        if ( !$userdata ) {
+        // despite the name, Laravel docs clearly specify that this method should not
+        // check if the password is ok, only retrieve a user by identifier
+        $username = $credentials[LdapUser::keyName()];
+
+        $userdata = $this->ldap_helper->retrieveUser($username);
+        if (!$userdata) {
             return null;
         }
 
         return new LdapUser($userdata);
     }
 
-    public function validateCredentials(Authenticatable $user, array $credentials)
+    public function validateCredentials(Authenticatable $user, array $credentials) : bool
     {
+        // this is where the identifier and password are checked
         $keyfield = LdapUser::keyName();
-        $identifier = $credentials[$keyfield];
-        
-        if ( $user->$keyfield !== $identifier ) {
+        $username = $credentials[$keyfield];
+
+        // check that the identifier of the user matches the one in the credentials
+        if ($user->$keyfield !== $username) {
             return false;
         }
 
         $password = $credentials['password'];
 
-        return $this->ldap_helper->bind($identifier, $password);
+        // check identifier and password against LDAP server
+        return $this->ldap_helper->checkCredentials($username, $password);
     }
 }
