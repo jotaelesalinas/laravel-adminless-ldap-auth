@@ -43,7 +43,7 @@ If you cannot upgrade to the latest versions, you can have a look at the old tut
 
 ## Installation
 
-### Create a new Laravel project, if needed
+### Create a new Laravel project
 
 ```bash
 composer create-project laravel/laravel adminless && \
@@ -203,6 +203,7 @@ want "imported" into your User model _on every sucessful login_.
     // 'field_in_local_user_model' => 'attribute_in_ldap_server',
     env('LOCAL_USER_KEY_FIELD', null) => 'uid',
     'name' => 'cn',
+    'email' => 'mail',
     'phone' => 'telephonenumber',
 ],
 ```
