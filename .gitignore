@@ -1,1 +1,7 @@
-laravel-simple-ldap-auth
+build
+composer.lock
+vendor
+phpcs.xml
+phpunit.xml
+.phpunit.result.cache
+.DS_Store

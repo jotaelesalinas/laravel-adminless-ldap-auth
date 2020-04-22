@@ -2,6 +2,13 @@
 
 Authenticate users in Laravel against an _adminless_ LDAP server
 
+[![Latest Version on Packagist][ico-version]][link-packagist]
+[![Software License][ico-license]](LICENSE.md)
+[![Build Status][ico-travis]][link-travis]
+[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
+[![Quality Score][ico-code-quality]][link-code-quality]
+[![Total Downloads][ico-downloads]][link-downloads]
+
 This is a detailed step-by-step [Laravel](https://laravel.com/) installation manual adapted
 for _adminless_ LDAP authentication.
 
@@ -233,7 +240,7 @@ Auth::id()      // "einstein"
 
 ## Auth UI scaffold
 
-You can build your login system around `Auth`, but as you already probably know,
+You can build your own login system around `Auth`, but as you already probably know,
 Laravel provides an amazing scaffold for authentication. Here's how you can use it.
 
 ### Create the auth routes, controllers and views
@@ -398,3 +405,36 @@ Was this article useful? Give it a star!
 - [ ] Instructions for ActiveDirectory -- help needed, I don't have access to any AD server
 - [ ] Tests
 - [ ] Check code style
+
+## Contributing
+
+Please see [CONTRIBUTING](CONTRIBUTING.md) and [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md) for details.
+
+## Security
+
+If you discover any security related issues, please email jotaelesalinas@example.com instead of using the issue tracker.
+
+## Credits
+
+- [José Luis Salinas][link-author]
+- [All Contributors][link-contributors]
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+
+
+[ico-version]: https://img.shields.io/packagist/v/jotaelesalinas/laravel-simple-ldap-auth.svg?style=flat-square
+[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/jotaelesalinas/laravel-simple-ldap-auth/master.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/jotaelesalinas/laravel-simple-ldap-auth.svg?style=flat-square
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/jotaelesalinas/laravel-simple-ldap-auth.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/jotaelesalinas/laravel-simple-ldap-auth.svg?style=flat-square
+
+[link-packagist]: https://packagist.org/packages/jotaelesalinas/laravel-simple-ldap-auth
+[link-travis]: https://travis-ci.org/jotaelesalinas/laravel-simple-ldap-auth
+[link-scrutinizer]: https://scrutinizer-ci.com/g/jotaelesalinas/laravel-simple-ldap-auth/code-structure
+[link-code-quality]: https://scrutinizer-ci.com/g/jotaelesalinas/laravel-simple-ldap-auth
+[link-downloads]: https://packagist.org/packages/jotaelesalinas/laravel-simple-ldap-auth
+[link-author]: https://github.com/jotaelesalinas
+[link-contributors]: ../../contributors
