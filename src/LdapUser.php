@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace JotaEleSalinas\AdminlessLdap;
 
 use Illuminate\Contracts\Auth\Authenticatable;
-use \Illuminate\Auth\Authenticatable as AuthenticatableTrait;
+use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 
 // very ugly hack to be able to override $rememberTokenName
 // (it is inside a trait, that is why we cannot override it directly)

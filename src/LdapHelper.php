@@ -12,24 +12,28 @@ class LdapHelper
     protected $sync_attributes = null;
 
     // Makes sure that the needed config options exist and caches them
-    public function __construct(array $config)
+    public function __construct($config)
     {
-        $this->user_key = config('ldap_auth.identifiers.ldap.locate_users_by', null);
-        if (!$this->user_key) {
-            throw new \Exception('LdapHelper: missing config "ldap_auth.identifiers.ldap.locate_users_by".');
-        }
+        $this->user_key = $config['identifiers']['ldap']['locate_users_by'];
+        //if (!$this->user_key) {
+        //    throw new \Exception('LdapHelper: missing config "ldap_auth.identifiers.ldap.locate_users_by".');
+        //}
 
-        $this->user_full_dn_fmt = config('ldap_auth.identifiers.ldap.user_format', null);
-        if (!$this->user_full_dn_fmt) {
-            throw new \Exception('LdapHelper: missing config "ldap_auth.identifiers.ldap.user_format".');
-        }
+        $this->user_full_dn_fmt = $config['identifiers']['ldap']['user_format'];
+        //if (!$this->user_full_dn_fmt) {
+        //    throw new \Exception('LdapHelper: missing config "ldap_auth.identifiers.ldap.user_format".');
+        //}
 
-        $this->sync_attributes = config('ldap_auth.sync_attributes', []);
+        $this->sync_attributes = $config['sync_attributes'];
     }
 
     // Retrieves an LDAP user by identifier, no password checking yet
     public function retrieveUser(string $identifier) : ?array
     {
+        if ($identifier === '') {
+            return null;
+        }
+
         $ldapuser = Adldap::search()->where($this->user_key, '=', $identifier)->first();
         if (!$ldapuser) {
             // log error
@@ -94,6 +98,10 @@ class LdapHelper
     // Binds a user to the LDAP server, efectively checking if identifier and password match
     public function checkCredentials(string $identifier, string $password) : bool
     {
+        if ($identifier === '') {
+            return false;
+        }
+
         $userdn = sprintf($this->user_full_dn_fmt, $identifier);
 
         // you might need this, as reported in

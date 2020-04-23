@@ -405,7 +405,8 @@ Was this article useful? Give it a star!
 - [ ] Do we have to trigger events for login attempts, success, failure, logout, etcc? Or are they triggered somewhere else?
 - [ ] Instructions for ActiveDirectory -- help needed, I don't have access to any AD server
 - [ ] Tests
-- [ ] Check code style
+- [ ] Extend `LdapUser` on `Illuminate\Auth\GenericUser`
+- [ ] Remove Adldap2 dependency and use [PHP's LDAP module](https://www.php.net/manual/en/book.ldap.php) directly
 
 ## Contributing
 
