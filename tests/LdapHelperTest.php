@@ -31,12 +31,14 @@ class LdapHelperTest extends TestCase
         parent::tearDown();
     }
 
-    protected static function config () {
+    protected static function config ()
+    {
         return [
             'identifiers' => [
                 'ldap' => [
-                    'locate_users_by' => 'value1',
-                    'user_format' => 'value2',
+                    'locate_users_by' => 'sAMAccountName',
+                    'bind_users_by' => 'cn',
+                    'user_format' => 'cn=%s,ou=users,dc=Acme,dc=corp',
                 ],
             ],
             'sync_attributes' => [
@@ -60,6 +62,16 @@ class LdapHelperTest extends TestCase
         $config = self::config();
         set_error_handler($this->err_handler);
         unset($config['identifiers']['ldap']['locate_users_by']);
+        $this->expectException(_CustomException::class);
+        $lh = new LdapHelper($config);
+        restore_error_handler();
+    }
+
+    public function testConstructMissingConfigBind()
+    {
+        $config = self::config();
+        set_error_handler($this->err_handler);
+        unset($config['identifiers']['ldap']['bind_users_by']);
         $this->expectException(_CustomException::class);
         $lh = new LdapHelper($config);
         restore_error_handler();
@@ -105,7 +117,7 @@ class LdapHelperTest extends TestCase
         $config = self::config();
         $lh = new LdapHelper($config);
 
-        $userdata = $lh->checkCredentials('', '');
+        $userdata = $lh->checkCredentials(new LdapUser(), '', '');
         $this->assertFalse($userdata);
 
         $mock_attempt = Mockery::mock();
@@ -117,7 +129,8 @@ class LdapHelperTest extends TestCase
               ->once()
               ->andReturn($mock_attempt);
         
-        $userdata = $lh->checkCredentials('asdf', '');
+        $user = new LdapUser(['sAMAccountName' => 'jdoe', 'cn' => 'John Doe', 'email' => 'jdoe@example.com']);
+        $userdata = $lh->checkCredentials($user, 'asdf', '');
         $this->assertFalse($userdata);
     }
 }

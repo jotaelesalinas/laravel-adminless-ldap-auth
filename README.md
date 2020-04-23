@@ -119,17 +119,31 @@ LDAP_SCHEMA=OpenLDAP                         # Has to be one of these:
                                              #  - ActiveDirectory
 LDAP_HOSTS=ldap.forumsys.com                 # Your LDAP server
 LDAP_BASE_DN=dc=example,dc=com               # base distinguished name
-LDAP_USER_ATTRIBUTE=uid                      # field by which your users are
+LDAP_USER_ATTRIBUTE_SEARCH=uid               # field by which your users are
                                              # identified in the LDAP server
-LDAP_USER_FORMAT=${LDAP_USER_ATTRIBUTE}=%s,${LDAP_BASE_DN}
+LDAP_USER_ATTRIBUTE_BIND=uid                 # field by which your users are
+                                             # binded to the LDAP server
+LDAP_USER_FULL_DN_FMT=${LDAP_USER_ATTRIBUTE_BIND}=%s,${LDAP_BASE_DN}
                                              # full user distinguished name
-                                             # to be used with sprintf,
+                                             # to be used with sprintf:
+                                             # %s will be replaced by
+                                             # $user->${LDAP_USER_ATTRIBUTE_BIND}
 LDAP_CONNECTION=default                      # which configuration to use
                                              # from config/ldap.php
 ```
 
-Bear in mind that `LDAP_USER_FORMAT` is composed of the two previous values, for this
+Bear in mind that `LDAP_USER_FULL_DN_FMT` is composed of the two previous values, for this
 specific setup. You might need to modify it as well.
+
+**For ActiveDirectory users**
+
+This configuration might work for you (I can't promise it will):
+
+```bash
+LDAP_SCHEMA=ActiveDirectory
+LDAP_USER_ATTRIBUTE_SEARCH=sAMAccountName
+LDAP_USER_ATTRIBUTE_BIND=cn
+```
 
 ### Configure the LDAP connection in `config/ldap.php`
 
@@ -188,9 +202,9 @@ Tell the Adldap library which field uniquely identifies the users in your LDAP s
     // ... other code ...
 
     'ldap' => [
-        'locate_users_by' => env('LDAP_USER_ATTRIBUTE', 'userprincipalname'),
-        'bind_users_by' => env('LDAP_USER_ATTRIBUTE', 'distinguishedname'),
-        'user_format' => env('LDAP_USER_FORMAT', ''),
+        'locate_users_by' => env('LDAP_USER_ATTRIBUTE_SEARCH', ''),
+        'bind_users_by' => env('LDAP_USER_ATTRIBUTE_BIND', ''),
+        'user_format' => env('LDAP_USER_FULL_DN_FMT', ''),
     ],
 
     // ... other code ...

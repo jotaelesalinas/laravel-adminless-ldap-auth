@@ -4,26 +4,21 @@ declare(strict_types=1);
 namespace JotaEleSalinas\AdminlessLdap;
 
 use Adldap\Laravel\Facades\Adldap;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class LdapHelper
 {
-    protected $user_key = null;
+    protected $search_field = null;
+    protected $bind_field = null;
     protected $user_full_dn_fmt = null;
     protected $sync_attributes = null;
 
     // Makes sure that the needed config options exist and caches them
     public function __construct($config)
     {
-        $this->user_key = $config['identifiers']['ldap']['locate_users_by'];
-        //if (!$this->user_key) {
-        //    throw new \Exception('LdapHelper: missing config "ldap_auth.identifiers.ldap.locate_users_by".');
-        //}
-
+        $this->search_field = $config['identifiers']['ldap']['locate_users_by'];
+        $this->bind_field = $config['identifiers']['ldap']['bind_users_by'];
         $this->user_full_dn_fmt = $config['identifiers']['ldap']['user_format'];
-        //if (!$this->user_full_dn_fmt) {
-        //    throw new \Exception('LdapHelper: missing config "ldap_auth.identifiers.ldap.user_format".');
-        //}
-
         $this->sync_attributes = $config['sync_attributes'];
     }
 
@@ -34,7 +29,7 @@ class LdapHelper
             return null;
         }
 
-        $ldapuser = Adldap::search()->where($this->user_key, '=', $identifier)->first();
+        $ldapuser = Adldap::search()->where($this->search_field, '=', $identifier)->first();
         if (!$ldapuser) {
             // log error
             return null;
@@ -96,13 +91,19 @@ class LdapHelper
     }
 
     // Binds a user to the LDAP server, efectively checking if identifier and password match
-    public function checkCredentials(string $identifier, string $password) : bool
+    public function checkCredentials(Authenticatable $user, string $identifier, string $password) : bool
     {
         if ($identifier === '') {
             return false;
         }
+        
+        $search = $this->search_field;
+        if ($user->$search != $identifier) {
+            return false;
+        }
 
-        $userdn = sprintf($this->user_full_dn_fmt, $identifier);
+        $bind = $this->bind_field;
+        $userdn = sprintf($this->user_full_dn_fmt, $user->$bind);
 
         // you might need this, as reported in
         // [#14](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/issues/14):

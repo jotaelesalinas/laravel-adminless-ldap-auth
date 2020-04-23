@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Config;
 
 class LdapUser extends GenericUser
 {
-    public function __construct(array $attributes)
+    public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
     }

@@ -48,16 +48,16 @@ class AdminlessLdapUserProvider implements UserProvider
     {
         // this is where the identifier and password are checked
         $keyfield = LdapUser::keyName();
-        $username = $credentials[$keyfield];
+        $identifier = $credentials[$keyfield];
 
         // check that the identifier of the user matches the one in the credentials
-        if ($user->$keyfield !== $username) {
+        if ($user->$keyfield !== $identifier) {
             return false;
         }
 
         $password = $credentials['password'];
 
         // check identifier and password against LDAP server
-        return $this->ldap_helper->checkCredentials($username, $password);
+        return $this->ldap_helper->checkCredentials($user, $identifier, $password);
     }
 }
