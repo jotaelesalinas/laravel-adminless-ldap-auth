@@ -22,11 +22,16 @@ class LdapHelper
         $this->sync_attributes = $config['sync_attributes'];
     }
 
-    // Retrieves an LDAP user by identifier, no password checking yet
-    public function retrieveUser(string $identifier) : ?array
+    protected function retrieveLdapAttribs(string $identifier) : ?array
     {
+        static $cached_users = [];
+
         if ($identifier === '') {
             return null;
+        }
+
+        if (isset($cached_users[$identifier])) {
+            return $cached_users[$identifier];
         }
 
         $ldapuser = Adldap::search()->where($this->search_field, '=', $identifier)->first();
@@ -37,45 +42,41 @@ class LdapHelper
         // if you want to see the list of available attributes in your specific LDAP server:
         // dd($ldapuser);
         // and look for `attributes` (protected)
+        
+        $ldapuser_attrs = self::accessProtected($ldapuser, 'attributes');
+
+        $attrs = [];
+        foreach ($ldapuser_attrs as $k => $v) {
+            if ($k == 'objectclass') {
+                continue;
+            } else if (preg_match('/^\d+$/', $k . '')) {
+                continue;
+            }
+            $attrs[$k] = is_array($v) ? $v[0] : $v;
+        }
+
+        $cached_users[$identifier] = $attrs;
+        return $attrs;
+    }
+
+    // Retrieves an LDAP user by identifier, no password checking yet
+    public function retrieveUser(string $identifier) : ?array
+    {
+        $user = $this->retrieveLdapAttribs($identifier);
+        if ( !$user ) {
+            return null;
+        }
 
         $attrs = [];
 
-        // needed if any attribute is not directly accessible via a method call.
-        // attributes in \Adldap\Models\User are protected, so we will need
-        // to retrieve them using reflection.
-        $ldapuser_attrs = null;
-
         foreach ($this->sync_attributes as $local_attr => $ldap_attr) {
-            $method = 'get' . $ldap_attr;
-            if (method_exists($ldapuser, $method)) {
-                $attrs[$local_attr] = $ldapuser->$method();
-                continue;
-            }
-
-            if ($ldapuser_attrs === null) {
-                $ldapuser_attrs = self::accessProtected($ldapuser, 'attributes');
-            }
-
-            if (!isset($ldapuser_attrs[$ldap_attr])) {
+            if (!isset($user[$ldap_attr])) {
                 // an exception could be thrown
                 $attrs[$local_attr] = null;
                 continue;
             }
 
-            if (!is_array($ldapuser_attrs[$ldap_attr])) {
-                $attrs[$local_attr] = $ldapuser_attrs[$ldap_attr];
-            }
-
-            if (count($ldapuser_attrs[$ldap_attr]) == 0) {
-                // an exception could be thrown
-                $attrs[$local_attr] = null;
-                continue;
-            }
-
-            // now it returns the first item, but it could return
-            // a comma-separated string or any other thing that suits you better
-            $attrs[$local_attr] = $ldapuser_attrs[$ldap_attr][0];
-            //$attrs[$local_attr] = implode(',', $ldapuser_attrs[$ldap_attr]);
+            $attrs[$local_attr] = $user[$ldap_attr];
         }
 
         return $attrs;
@@ -91,19 +92,19 @@ class LdapHelper
     }
 
     // Binds a user to the LDAP server, efectively checking if identifier and password match
-    public function checkCredentials(Authenticatable $user, string $identifier, string $password) : bool
+    public function checkCredentials(string $identifier, string $password) : bool
     {
         if ($identifier === '') {
             return false;
         }
         
-        $search = $this->search_field;
-        if ($user->$search != $identifier) {
+        $user_ldap_attribs = $this->retrieveLdapAttribs($identifier);
+
+        if ($user_ldap_attribs[$this->search_field] != $identifier) {
             return false;
         }
 
-        $bind = $this->bind_field;
-        $userdn = sprintf($this->user_full_dn_fmt, $user->$bind);
+        $userdn = sprintf($this->user_full_dn_fmt, $user_ldap_attribs[$this->bind_field]);
 
         // you might need this, as reported in
         // [#14](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/issues/14):

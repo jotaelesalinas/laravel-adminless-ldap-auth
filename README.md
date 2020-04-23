@@ -217,7 +217,7 @@ want "imported" into your User model _on every sucessful login_.
 ```php
 'sync_attributes' => [
     // 'field_in_local_user_model' => 'attribute_in_ldap_server',
-    env('LOCAL_USER_KEY_FIELD', null) => 'uid',
+    env('LOCAL_USER_KEY_FIELD', null) => env('LDAP_USER_ATTRIBUTE_SEARCH', null),
     'name' => 'cn',
     'email' => 'mail',
     'phone' => 'telephonenumber',

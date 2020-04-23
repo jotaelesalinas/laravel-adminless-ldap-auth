@@ -58,6 +58,6 @@ class AdminlessLdapUserProvider implements UserProvider
         $password = $credentials['password'];
 
         // check identifier and password against LDAP server
-        return $this->ldap_helper->checkCredentials($user, $identifier, $password);
+        return $this->ldap_helper->checkCredentials($identifier, $password);
     }
 }
