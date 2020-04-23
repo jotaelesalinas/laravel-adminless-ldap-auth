@@ -5,5 +5,4 @@ phpcs.xml
 phpunit.xml
 .phpunit.result.cache
 .DS_Store
-notes.md
-CHANGELOG.md
+_*

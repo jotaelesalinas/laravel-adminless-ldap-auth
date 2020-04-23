@@ -16,7 +16,7 @@ class LdapUser extends GenericUser
     // The name of the property that uniquely identifies the users
     public static function keyName() : string
     {
-        $column_name = Config::get('auth.key_user_field', null);
+        $column_name = Config::get('auth.auth_user_key', null);
         if (!$column_name) {
             throw new \Exception('LdapUser: Could not find keyName.');
         }

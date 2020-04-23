@@ -11,61 +11,146 @@ Authenticate users in Laravel against an _adminless_ LDAP server
 [![Quality Score][ico-code-quality]][link-code-quality]
 -->
 
-This is a detailed step-by-step [Laravel](https://laravel.com/) installation manual adapted
-for _adminless_ LDAP authentication.
+**Important**: The use case of this authentication package is very specific: in the Laravel application there is no user management at all. Users are either allowed to use the website or rejected, depending on the credentials that they provide. That's it. User management is done in the LDAP server.
 
-There is no user management at all. Users are either allowed to use the website or rejected.
-That's it.
+**Disclaimer**: This software is offered as-is. Use it at your own risk. Read the license.
 
-Of course, you can add a "role" attribute to your LDAP directory and use that to control access
-to different pages or resources. But you won't be able to modify the role from this website, or
-add/search/modify/delete users. User management is done via the LDAP server.
-
-If you need user management, use [Adldap2/Adldap2-Laravel](https://github.com/Adldap2/Adldap2-Laravel)
-instead. It's a great library but it requires an administrator user in the LDAP server -the same way
-that you need a database user in MySQL- in order to perform all user-related operations, including
-checking if a user exists and the password is correct.
-In my case I didn't have any available admin user in the LDAP server, so I had to adapt the library
-default behaviour to this specific use case.
-
-As testing environment, we will be using this publicly available testing LDAP server:
+This package uses this publicly available testing LDAP server as default configuration:
 
 [http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
 
-Tested on 2020-04-16 with Laravel v7.6 and Adldap2-Laravel v6.0.
-
-If you cannot upgrade to the latest versions, you can have a look at the old tutorials for:
-- [Laravel 6.2 and Adldap2-Laravel 6.0](https://github.com/jotaelesalinas/laravel-adminless-ldap-auth/blob/d26ea52ddcc9a1336eb49a9c01469f51f8c83165/README.md)
-- [Laravel 5.7 and Adldap2-Laravel 5.0](https://github.com/jotaelesalinas/laravel-adminless-ldap-auth/blob/56fa7c0f46c16cd4a97a11fbf75781f1beedf213/README.md)
-- [Laravel 5.5 and Adldap2-Laravel 3.0](https://github.com/jotaelesalinas/laravel-adminless-ldap-auth/blob/4fecf4c94317e27315eb47cf27dfb18567dc13db/README.md)
-
-**Disclaimer**: I created this GitHub repo because I faced a very specific problem some time ago and I could not find a solution on the internet. I decided to share the solution I came up with, just in case anyone else stumbled upon the same problem. You can consider this a proof-of-concept. I am really sorry but I can't look into your code or provide solutions to other use cases like Active Directory. That said, if you find a problem with this repo, you are very welcome to open an issue, indicating where exactly the error is, or even better, fix it and send a pull request.
-
-**Important**: I do not provide support. This software is offered as-is. Use it at your own risk.
+It is recommended that you start by testing that it works against this server -if possible- and then changing the configuration to your specific setup.
 
 ## Installation
 
-### Create a new Laravel project
-
-```bash
-composer create-project laravel/laravel adminless && \
-cd adminless
-```
-
-### Install jotaelesalinas/laravel-adminless-ldap-auth
+Require this package in your Laravel application:
 
 ```bash
 composer require jotaelesalinas/laravel-adminless-ldap-auth
 ```
 
-### Add users' login field to `.env`
+## Explanation of the _basic_ .env variables
 
-```bash
-LOCAL_USER_KEY_FIELD=id
+TL;DR:
+
+- `LDAP_USER_SEARCH_ATTRIBUTE`: the name of the attribute in the LDAP server that uniquely identifies a user, e.g. `uid`, `mail` or `sAMAccountName`. The value of this attribute is what the user will have to type as identifier in the login form (+ the password, of course).
+
+- `LDAP_USER_BIND_ATTRIBUTE`: the name of the attribute in the LDAP server that is used inside the distinguished name, e.g. `uid` or `cn`. The value will be read from the user attributes returned by the LDAP server.
+
+- `AUTH_USER_KEY_FIELD`: the name of the property that will uniquely identify the Auth user. By default, the name is `username` and the value is read from the LDAP user attribute `LDAP_USER_SEARCH_ATTRIBUTE`.
+
+The long version:
+
+To understand how configuration works, you have to know first the different steps of the authentication process and the objects and fields involved:
+
+1. The user provides their credentials with two fields: identifier and password. We use the generic word "identifier" because it can be a username, an email, a staff number, a phone number... you name it.
+
+    For now, let's say that the identifier is `jdoe`.
+
+2. We check in the LDAP server if there is any user with the given identifier. No password checks yet (this is how Laravel Auth works).
+
+    This check is done using the attribute `LDAP_USER_SEARCH_ATTRIBUTE` in the LDAP server. It can be `uid`, `sAMAccountName`... Depends on the LDAP server. In this example, it will be `uid`.
+
+    If there is a matching user, we will have a list of attributes from the LDAP user like this:
+
+```php
+[
+    'uid' => 'jdoe',
+    'cn' => 'John Doe',
+    'mail' => 'jdoe@example.com',
+    'telephonenumber' => '555-12-23-34',
+    'department' => 'Sales',
+    'location' => 'HQ',
+    'distinguishedName' => 'cn=John Doe,dc=example,dc=com',
+    ...
+]
 ```
 
-You can change the value of `LOCAL_USER_KEY_FIELD` to whatever you want, e.g. `username`, `email` or `phonenumber`,
-but you don't really have to.
+3. Then, we check that the credentials are correct. But! For authentication, LDAP does not use identifier + password. It uses "distinguished name" + password.
+
+    The distinguished name is a comma-separated list of fields that uniquely identifies an item inside the LDAP registry. In this example: `cn=John Doe,dc=example,dc=com`.
+
+    Gasp! For the password validation we might have to use a different field than the one used to search the user.
+
+    To avoid asking the users for their `uid` _and_ their `cn` in the login form, we need another .env variable, `LDAP_USER_BIND_ATTRIBUTE`, in this case `cn`.
+
+    The rest of the fields of the distinguished name, `dc=example,dc=com`, go into the .env variable `LDAP_BASE_DN`.
+
+    It could happen that both are the same, e.g. `LDAP_USER_SEARCH_ATTRIBUTE=uid` and `LDAP_USER_BIND_ATTRIBUTE=uid`.
+
+4. Finally, when the user is retrieved and the password validated, the data from the LDAP server is converted into an object of class `LdapUser`. This is the object returned by `Auth::user()`.
+
+    This object will have the identifier stored in the property that you specify in the .env variable `AUTH_USER_KEY_FIELD`. If it is `id`, the user will have a property `id` equal to `jdoe`. If you choose `username`, the user will have a property `username` equal to `jdoe`.
+
+    Also, using the config variable `ldap_auth.sync_attributes` you will be able to tell which fields from the LDAP server you want "imported" into the Auth user, and under which names. For security reasons, you have to whitelist the attributes to be imported.
+
+    As an example, if you have this entry in `config/ldap_auth.php`:
+
+    ```php
+    'sync_attributes' => [
+        // 'field_in_local_user_model' => 'attribute_in_ldap_server',
+        env('AUTH_USER_KEY_FIELD', null) => env('LDAP_USER_SEARCH_ATTRIBUTE', null),
+        'name' => 'cn',
+        'email' => 'mail',
+        'phone' => 'telephonenumber',
+    ],
+    ```
+
+    Given the sample LDAP user from the step 2, you will have the following Auth user:
+
+    ```php
+    JotaEleSalinas\AdminlessLdap\LdapUser {
+        "username": "jdoe",
+        "name": "John Doe",
+        "email": "jdoe@example.com",
+        "phone": "555-12-23-34",
+    }
+    ```
+
+    And this is the user object that you will use thoughout your Laravel app.
+
+    `LdapUser` is not an Eloquent model! You cannot do `LdapUser::where('uid', '=', 'jdoe')` and all the nice things that you might be used to do with Eloquent.
+
+## Configuration
+
+### Add variables to `.env`
+
+You will need the assistance of your LDAP administrator to get these options right.
+
+```bash
+LDAP_SCHEMA=OpenLDAP                # Has to be one of these:
+                                    #  - OpenLDAP
+                                    #  - FreeIPA
+                                    #  - ActiveDirectory
+LDAP_HOSTS=ldap.forumsys.com        # Your LDAP server
+LDAP_BASE_DN=dc=example,dc=com      # base distinguished name
+LDAP_USER_SEARCH_ATTRIBUTE=uid      # field by which your users are identified in the LDAP server
+LDAP_USER_BIND_ATTRIBUTE=uid        # field by which your users are binded to the LDAP server
+LDAP_USER_FULL_DN_FMT=${LDAP_USER_BIND_ATTRIBUTE}=%s,${LDAP_BASE_DN}
+                                    # full user distinguished name to be used with sprintf:
+                                    # %s will be replaced by $user->${LDAP_USER_BIND_ATTRIBUTE}
+LDAP_CONNECTION=default             # which configuration to use from config/ldap.php
+```
+
+These are just a few options, the most common ones and the ones needed to make this example work. There are many more in `config/ldap.php`.
+
+**For ActiveDirectory users**
+
+This configuration might work for you (I can't promise it will):
+
+```bash
+LDAP_SCHEMA=ActiveDirectory
+LDAP_USER_SEARCH_ATTRIBUTE=sAMAccountName
+LDAP_USER_BIND_ATTRIBUTE=cn
+```
+
+Also, add the name of the property that will uniquely identify your Auth user:
+
+```bash
+AUTH_USER_KEY_FIELD=username
+```
+
+You can change the value of `AUTH_USER_KEY_FIELD` to whatever you want, e.g. `id`, `email` or `phonenumber`, but you don't really have to.
 
 ### Modify `config/auth.php`
 
@@ -98,51 +183,14 @@ Delete the `api` guard if you dont need it. Or at least comment it out.
 Create this new entry:
 
 ```php
-'key_user_field' => env('LOCAL_USER_KEY_FIELD', null),
+'auth_user_key' => env('AUTH_USER_KEY_FIELD', null),
 ```
 
 ### Publish the config files of Adldap and AdldapAuth
 
 ```bash
-php artisan vendor:publish --provider="Adldap\Laravel\AdldapServiceProvider" && \
+php artisan vendor:publish --provider="Adldap\Laravel\AdldapServiceProvider"
 php artisan vendor:publish --provider="Adldap\Laravel\AdldapAuthServiceProvider"
-```
-
-### Add LDAP configuration options to `.env`
-
-You will need the assistance of your LDAP administrator to get these options right.
-
-```bash
-LDAP_SCHEMA=OpenLDAP                         # Has to be one of these:
-                                             #  - OpenLDAP
-                                             #  - FreeIPA
-                                             #  - ActiveDirectory
-LDAP_HOSTS=ldap.forumsys.com                 # Your LDAP server
-LDAP_BASE_DN=dc=example,dc=com               # base distinguished name
-LDAP_USER_ATTRIBUTE_SEARCH=uid               # field by which your users are
-                                             # identified in the LDAP server
-LDAP_USER_ATTRIBUTE_BIND=uid                 # field by which your users are
-                                             # binded to the LDAP server
-LDAP_USER_FULL_DN_FMT=${LDAP_USER_ATTRIBUTE_BIND}=%s,${LDAP_BASE_DN}
-                                             # full user distinguished name
-                                             # to be used with sprintf:
-                                             # %s will be replaced by
-                                             # $user->${LDAP_USER_ATTRIBUTE_BIND}
-LDAP_CONNECTION=default                      # which configuration to use
-                                             # from config/ldap.php
-```
-
-Bear in mind that `LDAP_USER_FULL_DN_FMT` is composed of the two previous values, for this
-specific setup. You might need to modify it as well.
-
-**For ActiveDirectory users**
-
-This configuration might work for you (I can't promise it will):
-
-```bash
-LDAP_SCHEMA=ActiveDirectory
-LDAP_USER_ATTRIBUTE_SEARCH=sAMAccountName
-LDAP_USER_ATTRIBUTE_BIND=cn
 ```
 
 ### Configure the LDAP connection in `config/ldap.php`
@@ -179,7 +227,8 @@ Again, you will need the assistance of your LDAP administrator. See comments bel
             'username' => env('LDAP_ADMIN_USERNAME', ''),
             'password' => env('LDAP_ADMIN_PASSWORD', ''),
 
-            // and talk to your LDAP administrator about these other options:
+            // and talk to your LDAP administrator about these other options.
+            // do not modify them here, use .env!
             'account_prefix' => env('LDAP_ACCOUNT_PREFIX', ''),
             'account_suffix' => env('LDAP_ACCOUNT_SUFFIX', ''),
             'port' => env('LDAP_PORT', 389),
@@ -195,15 +244,15 @@ Again, you will need the assistance of your LDAP administrator. See comments bel
 
 ### Configure the LDAP authentication in `config/ldap_auth.php`
 
-Tell the Adldap library which field uniquely identifies the users in your LDAP server:
+Tell the Adldap library how to search and bind users in your LDAP server:
 
 ```php
 'identifiers' => [
     // ... other code ...
 
     'ldap' => [
-        'locate_users_by' => env('LDAP_USER_ATTRIBUTE_SEARCH', ''),
-        'bind_users_by' => env('LDAP_USER_ATTRIBUTE_BIND', ''),
+        'locate_users_by' => env('LDAP_USER_SEARCH_ATTRIBUTE', ''),
+        'bind_users_by' => env('LDAP_USER_BIND_ATTRIBUTE', ''),
         'user_format' => env('LDAP_USER_FULL_DN_FMT', ''),
     ],
 
@@ -212,12 +261,12 @@ Tell the Adldap library which field uniquely identifies the users in your LDAP s
 ```
 
 And tell the new auth provider which fields from the LDAP user entry you will
-want "imported" into your User model _on every sucessful login_.
+want "imported" into your Auth user _on every sucessful login_.
 
 ```php
 'sync_attributes' => [
     // 'field_in_local_user_model' => 'attribute_in_ldap_server',
-    env('LOCAL_USER_KEY_FIELD', null) => env('LDAP_USER_ATTRIBUTE_SEARCH', null),
+    env('AUTH_USER_KEY_FIELD', null) => env('LDAP_USER_SEARCH_ATTRIBUTE', null),
     'name' => 'cn',
     'email' => 'mail',
     'phone' => 'telephonenumber',
@@ -226,14 +275,12 @@ want "imported" into your User model _on every sucessful login_.
 
 ## Usage
 
-That's it! Now you should be able to use
-[Laravel's built-in authentication](https://laravel.com/docs/7.x/authentication#included-authenticating)
-to perform all auth-related tasks, e.g. `Auth::check()`, `Auth::attempt()`, `Auth::user()`, etc.
+That's it! Now you should be able to use [Laravel's built-in authentication](https://laravel.com/docs/7.x/authentication#included-authenticating) to perform all auth-related tasks, e.g. `Auth::check()`, `Auth::attempt()`, `Auth::user()`, etc.
 
 You can try with tinker:
 
 ```bash
-php artisan optimize:clear && \
+php artisan optimize:clear
 php artisan tinker
 ```
 
@@ -255,174 +302,25 @@ Auth::user()    // dump of your User model
 Auth::id()      // "einstein"
 ```
 
-## Auth UI scaffold
-
-You can build your own login system around `Auth`, but as you already probably know,
-Laravel provides an amazing scaffold for authentication. Here's how you can use it.
-
-### Create the auth routes, controllers and views
-
-```bash
-composer require laravel/ui && \
-php artisan ui vue --auth && \
-npm install && npm run dev
-```
-
-### Delete unneeded files and folders
-
-```bash
-# user migration
-rm database/migrations/2014_10_12_000000_create_users_table.php && \
-# password reset migration
-rm database/migrations/2014_10_12_100000_create_password_resets_table.php && \
-# unnecessary auth controllers and views
-rm app/Http/Controllers/Auth/ConfirmPasswordController.php && \
-rm app/Http/Controllers/Auth/ForgotPasswordController.php && \
-rm app/Http/Controllers/Auth/RegisterController.php && \
-rm app/Http/Controllers/Auth/ResetPasswordController.php && \
-rm app/Http/Controllers/Auth/VerificationController.php && \
-rm resources/views/auth/register.blade.php && \
-rm resources/views/auth/verify.blade.php && \
-rm -r resources/views/auth/passwords
-```
-
-### Remove unused auth routes in `routes/web.php`
-
-```php
-// replace this line:
-// Auth::routes();
-// with these ones:
-Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
-Route::post('login', 'Auth\LoginController@login');
-Route::post('logout', 'Auth\LoginController@logout')->name('logout');
-// If you want to be able to log out from the /logout URL, e.g. during development:
-Route::get('logout', 'Auth\LoginController@logout');
-```
-
-### Tell Laravel that users are identified by your field of choice in `app/Http/Controllers/Auth/LoginController.php`
-
-```php
-class LoginController extends Controller
-{
-    // ... existing code ...
-
-    public function username()
-    {
-        return config('auth.key_user_field');
-    }
-}
-```
-
-### Adapt login form in `resources/views/auth/login.blade.php`
-
-Change `email` to `config('auth.key_user_field')` (HTML code might change in the future):
-
-```html
-<div class="form-group row">
-    <label for="{{ config('auth.key_user_field') }}"
-           class="col-md-4 col-form-label text-md-right"
-        >{{ __('Username') }}</label>
-
-    <div class="col-md-6">
-        <input id="{{ config('auth.key_user_field') }}"
-               type="text"
-               class="form-control @error(config('auth.key_user_field')) is-invalid @enderror"
-               name="{{ config('auth.key_user_field') }}"
-               value="{{ old(config('auth.key_user_field')) }}"
-               required
-               autocomplete="{{ config('auth.key_user_field') }}"
-               autofocus>
-
-        @error(config('auth.key_user_field'))
-            <span class="invalid-feedback" role="alert">
-                <strong>{{ $message }}</strong>
-            </span>
-        @enderror
-    </div>
-</div>
-```
-
-Now, delete the "Remember me" checkbox, because we will have no such functionality.
-Remove this whole form group (HTML markup could change in the future):
-
-```html
-<div class="form-group row">
-    <div class="col-md-6 offset-md-4">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-            <label class="form-check-label" for="remember">
-                {{ __('Remember Me') }}
-            </label>
-        </div>
-    </div>
-</div>
-```
-
-### Show user data on login
-
-Modify `resources/views/home.blade.php`:
-
-Change the line:
-
-```html
-You are logged in!
-```
-
-With:
-
-```html
-<p>You are logged in!</p>
-
-<p>Your user data:</p>
-
-<pre>
-{{ json_encode(Auth::user(), JSON_PRETTY_PRINT) }}
-</pre>
-```
-
-### Final touches
-
-Set your URL in `.env`:
-
-```bash
-APP_URL=http://localhost:8000
-```
-
-Clear your caches:
-
-```bash
-php artisan optimize:clear
-```
-
-### Good to go!
-
-Let's run the website and try to log in.
-
-```bash
-php artisan serve
-```
-
-Visit <http://localhost:8000> in your favourite browser.
-
-Try to visit <http://localhost:8000/home> before logging in. You should be redirected to the login page.
-
 Remember that you have these users available in the testing LDAP server:
 `riemann`, `gauss`, `euler`, `euclid`, `einstein`, `newton` and `tesla`.
 The password is `password` for all of them.
 
-Log in and play around.
 
-Was this article useful? Give it a star!
+Was this package useful? Give it a star!
+
+
 
 ## To do
 
-- [x] Upload to packagist
-- [x] Set up the GitHub Hook for Packagist <https://packagist.org/about#how-to-update-packages>
+- [ ] Upload to packagist
+- [ ] Set up the GitHub Hook for Packagist <https://packagist.org/about#how-to-update-packages>
 - [ ] Do we have to trigger events for login attempts, success, failure, logout, etcc? Or are they triggered somewhere else?
 - [ ] Instructions for ActiveDirectory -- help needed, I don't have access to any AD server
-- [ ] Tests
-- [ ] Extend `LdapUser` on `Illuminate\Auth\GenericUser`
+- [ ] Tests -- ongoing
+- [ ] Add instructions to build the login UI
 - [ ] Remove Adldap2 dependency and use [PHP's LDAP module](https://www.php.net/manual/en/book.ldap.php) directly
+- [x] Extend `LdapUser` on `Illuminate\Auth\GenericUser`
 
 ## Contributing
 

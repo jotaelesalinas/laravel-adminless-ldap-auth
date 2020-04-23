@@ -40,7 +40,7 @@ class LdapUserTest extends TestCase
     public function testKeyNameComesFromConfig()
     {
         Config::shouldReceive('get')
-              ->with('auth.key_user_field', null)
+              ->with('auth.auth_user_key', null)
               ->once()
               ->andReturn('asdf');
         $key = LdapUser::keyName();
@@ -50,7 +50,7 @@ class LdapUserTest extends TestCase
     public function testThrowsWhenConfigKeyMissingStatic()
     {
         Config::shouldReceive('get')
-              ->with('auth.key_user_field', null)
+              ->with('auth.auth_user_key', null)
               ->once()
               ->andReturn(null);
         $this->expectException(\Exception::class);
@@ -60,7 +60,7 @@ class LdapUserTest extends TestCase
     public function testThrowsWhenConfigKeyMissing()
     {
         Config::shouldReceive('get')
-              ->with('auth.key_user_field', null)
+              ->with('auth.auth_user_key', null)
               ->once()
               ->andReturn(null);
         $this->expectException(\Exception::class);
