@@ -11,27 +11,19 @@ Authenticate users in Laravel against an _adminless_ LDAP server
 [![Quality Score][ico-code-quality]][link-code-quality]
 -->
 
-**Important**: The use case of this authentication package is very specific: in the Laravel application there is no user management at all. Users are either allowed to use the website or rejected, depending on the credentials that they provide. That's it. User management is done in the LDAP server.
+**Important**: The use case for this authentication package is very specific:
 
-**Disclaimer**: This software is offered as-is. Use it at your own risk. Read the license.
-
-This package uses this publicly available testing LDAP server as default configuration:
-
-[http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
-
-It is recommended that you start by testing that it works against this server -if possible- and then changing the configuration to your specific setup.
+- This package does only one thing: validate users' credentials against an LDAP server.
+- It is not possible to create/modify/delete users in the Laravel application.
+- User management is done in the LDAP server.
 
 ## Installation
-
-Require this package in your Laravel application:
 
 ```bash
 composer require jotaelesalinas/laravel-adminless-ldap-auth
 ```
 
-## Explanation of the _basic_ .env variables
-
-TL;DR:
+## Basic .env variables
 
 - `LDAP_USER_SEARCH_ATTRIBUTE`: the name of the attribute in the LDAP server that uniquely identifies a user, e.g. `uid`, `mail` or `sAMAccountName`. The value of this attribute is what the user will have to type as identifier in the login form (+ the password, of course).
 
@@ -39,77 +31,7 @@ TL;DR:
 
 - `AUTH_USER_KEY_FIELD`: the name of the property that will uniquely identify the Auth user. By default, the name is `username` and the value is read from the LDAP user attribute `LDAP_USER_SEARCH_ATTRIBUTE`.
 
-The long version:
-
-To understand how configuration works, you have to know first the different steps of the authentication process and the objects and fields involved:
-
-1. The user provides their credentials with two fields: identifier and password. We use the generic word "identifier" because it can be a username, an email, a staff number, a phone number... you name it.
-
-    For now, let's say that the identifier is `jdoe`.
-
-2. We check in the LDAP server if there is any user with the given identifier. No password checks yet (this is how Laravel Auth works).
-
-    This check is done using the attribute `LDAP_USER_SEARCH_ATTRIBUTE` in the LDAP server. It can be `uid`, `sAMAccountName`... Depends on the LDAP server. In this example, it will be `uid`.
-
-    If there is a matching user, we will have a list of attributes from the LDAP user like this:
-
-```php
-[
-    'uid' => 'jdoe',
-    'cn' => 'John Doe',
-    'mail' => 'jdoe@example.com',
-    'telephonenumber' => '555-12-23-34',
-    'department' => 'Sales',
-    'location' => 'HQ',
-    'distinguishedName' => 'cn=John Doe,dc=example,dc=com',
-    ...
-]
-```
-
-3. Then, we check that the credentials are correct. But! For authentication, LDAP does not use identifier + password. It uses "distinguished name" + password.
-
-    The distinguished name is a comma-separated list of fields that uniquely identifies an item inside the LDAP registry. In this example: `cn=John Doe,dc=example,dc=com`.
-
-    Gasp! For the password validation we might have to use a different field than the one used to search the user.
-
-    To avoid asking the users for their `uid` _and_ their `cn` in the login form, we need another .env variable, `LDAP_USER_BIND_ATTRIBUTE`, in this case `cn`.
-
-    The rest of the fields of the distinguished name, `dc=example,dc=com`, go into the .env variable `LDAP_BASE_DN`.
-
-    It could happen that both are the same, e.g. `LDAP_USER_SEARCH_ATTRIBUTE=uid` and `LDAP_USER_BIND_ATTRIBUTE=uid`.
-
-4. Finally, when the user is retrieved and the password validated, the data from the LDAP server is converted into an object of class `LdapUser`. This is the object returned by `Auth::user()`.
-
-    This object will have the identifier stored in the property that you specify in the .env variable `AUTH_USER_KEY_FIELD`. If it is `id`, the user will have a property `id` equal to `jdoe`. If you choose `username`, the user will have a property `username` equal to `jdoe`.
-
-    Also, using the config variable `ldap_auth.sync_attributes` you will be able to tell which fields from the LDAP server you want "imported" into the Auth user, and under which names. For security reasons, you have to whitelist the attributes to be imported.
-
-    As an example, if you have this entry in `config/ldap_auth.php`:
-
-    ```php
-    'sync_attributes' => [
-        // 'field_in_local_user_model' => 'attribute_in_ldap_server',
-        env('AUTH_USER_KEY_FIELD', null) => env('LDAP_USER_SEARCH_ATTRIBUTE', null),
-        'name' => 'cn',
-        'email' => 'mail',
-        'phone' => 'telephonenumber',
-    ],
-    ```
-
-    Given the sample LDAP user from the step 2, you will have the following Auth user:
-
-    ```php
-    JotaEleSalinas\AdminlessLdap\LdapUser {
-        "username": "jdoe",
-        "name": "John Doe",
-        "email": "jdoe@example.com",
-        "phone": "555-12-23-34",
-    }
-    ```
-
-    And this is the user object that you will use thoughout your Laravel app.
-
-    `LdapUser` is not an Eloquent model! You cannot do `LdapUser::where('uid', '=', 'jdoe')` and all the nice things that you might be used to do with Eloquent.
+See an [explanation of how the library works](docs/explanation.md) of how the library works for a better understanding of the rationale behind the different variables.
 
 ## Configuration
 
@@ -132,7 +54,7 @@ LDAP_USER_FULL_DN_FMT=${LDAP_USER_BIND_ATTRIBUTE}=%s,${LDAP_BASE_DN}
 LDAP_CONNECTION=default             # which configuration to use from config/ldap.php
 ```
 
-These are just a few options, the most common ones and the ones needed to make this example work. There are many more in `config/ldap.php`.
+These are just a few options, the ones needed to make this example work. There are many more in `config/ldap.php`.
 
 **For ActiveDirectory users**
 
@@ -285,21 +207,46 @@ php artisan tinker
 ```
 
 ```php
-Auth::check()   // false
-Auth::guest()   // true
-Auth::user()    // null
+Auth::guest()
+=> true
+Auth::check()
+=> false
+Auth::user()
+=> null
+Auth::id()
+=> null
+
+Auth::attempt(['id' => 'einstein', 'password' => ''])
+// Throws Adldap/Auth/PasswordRequiredException.
 
 Auth::attempt(['id' => 'einstein', 'password' => 'qwerty'])
-                // false
-                // will show a warning with the failed LDAP binding
-Auth::attempt(['id' => 'einstein', 'password' => 'password'])
-                // true
-                // might issue a warning about the session storage. just ignore it.
+// Issues a warning about ldap_bind() unable to bind to server and invalid credentials.
+=> false
 
-Auth::check()   // true
-Auth::guest()   // false
-Auth::user()    // dump of your User model
-Auth::id()      // "einstein"
+Auth::attempt(['id' => 'einstein', 'password' => 'password'])
+// In tinker it will issue a warning about the session storage. Just ignore it.
+=> true
+
+Auth::guest()
+=> false
+Auth::check()
+=> true
+Auth::user()
+=> JotaEleSalinas\AdminlessLdap\LdapUser {
+     +"id": "einstein",
+     +"name": "Albert Einstein",
+     +"email": "einstein@ldap.forumsys.com",
+     +"phone": "314-159-2653",
+   }
+Auth::id()
+=> "einstein"
+
+Auth::logout()
+=> null
+Auth::check()
+=> false
+Auth::user()
+=> null
 ```
 
 Remember that you have these users available in the public testing LDAP server:
@@ -314,8 +261,8 @@ Was this package useful? Give it a star!
 - [ ] Do we have to trigger events for login attempts, success, failure, logout, etcc? Or are they triggered somewhere else?
 - [ ] Instructions for ActiveDirectory -- help needed, I don't have access to any AD server
 - [ ] Tests -- ongoing
-- [ ] Add instructions to build the login UI
 - [ ] Remove Adldap2 dependency and use [PHP's LDAP module](https://www.php.net/manual/en/book.ldap.php) directly
+- [x] Add instructions to build the login UI
 - [x] Extend `LdapUser` on `Illuminate\Auth\GenericUser`
 
 ## Contributing
@@ -331,10 +278,17 @@ If you discover any security related issues, please email jotaelesalinas@example
 - [José Luis Salinas][link-author]
 - [All Contributors][link-contributors]
 
-## License
+## License and disclaimer
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
+The values shown in the previous example configuration make use of a publicly available testing LDAP server:
+
+[http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
+
+It is recommended that you start by testing that it works against this server -if possible- and then changing the configuration to your specific setup.
+
+The authors of this package are not linked in any way with forumsys.com . We are not responsible in any way for anything related to it.
 
 [ico-version]: https://img.shields.io/packagist/v/jotaelesalinas/laravel-adminless-ldap-auth.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
