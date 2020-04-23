@@ -6,7 +6,7 @@ namespace JotaEleSalinas\AdminlessLdap;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class AdminlessLdapUserProvider implements UserProvider
+class AdminlessUserProvider implements UserProvider
 {
     protected $ldap_helper = null;
 
@@ -22,12 +22,12 @@ class AdminlessLdapUserProvider implements UserProvider
 
     public function retrieveByToken($identifier, $token)
     {
-        throw new \Exception('AdminlessLdapUserProvider: Not possible to use "remember me" tokens.');
+        throw new \Exception('AdminlessUserProvider: Not possible to use "remember me" tokens.');
     }
 
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        throw new \Exception('AdminlessLdapUserProvider: Not possible to use "remember me" tokens.');
+        throw new \Exception('AdminlessUserProvider: Not possible to use "remember me" tokens.');
     }
 
     public function retrieveByCredentials(array $credentials) : ?Authenticatable

@@ -6,12 +6,12 @@ namespace JotaEleSalinas\AdminlessLdap;
 use Illuminate\Support\ServiceProvider;
 use Auth;
 
-class AdminlessLdapServiceProvider extends ServiceProvider
+class AdminlessServiceProvider extends ServiceProvider
 {
     public function boot()
     {
         Auth::provider('adminless_ldap', function () {
-            return new AdminlessLdapUserProvider(new LdapHelper(config('ldap_auth')));
+            return new AdminlessUserProvider(new LdapHelper(config('ldap_auth')));
         });
     }
 }

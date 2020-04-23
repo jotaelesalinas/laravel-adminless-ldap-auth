@@ -56,7 +56,7 @@
         },
         "laravel": {
             "providers": [
-                "JotaEleSalinas\\AdminlessLdap\\AdminlessLdapServiceProvider"
+                "JotaEleSalinas\\AdminlessLdap\\AdminlessServiceProvider"
             ]
         }
     },

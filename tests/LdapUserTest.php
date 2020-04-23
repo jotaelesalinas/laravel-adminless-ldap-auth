@@ -23,9 +23,16 @@ class LdapUserTest extends TestCase
         $this->assertEquals($user->id, 123);
         $this->assertEquals($user->name, 'John Doe');
 
+        $attrs = $user->__debugInfo();
+        $this->assertArrayHasKey('id', $attrs);
+        $this->assertArrayHasKey('name', $attrs);
+
         $user = new LdapUser([]);
         $this->assertObjectNotHasAttribute('id', $user);
         $this->assertObjectNotHasAttribute('name', $user);
+        $attrs = $user->__debugInfo();
+        $this->assertArrayNotHasKey('id', $attrs);
+        $this->assertArrayNotHasKey('name', $attrs);
         $this->expectException(\Exception::class);
         $user->id;
     }
@@ -40,7 +47,7 @@ class LdapUserTest extends TestCase
         $this->assertEquals($key, 'asdf');
     }
 
-    public function testThrowsWhenConfigKeyMissing()
+    public function testThrowsWhenConfigKeyMissingStatic()
     {
         Config::shouldReceive('get')
               ->with('auth.key_user_field', null)
@@ -48,6 +55,17 @@ class LdapUserTest extends TestCase
               ->andReturn(null);
         $this->expectException(\Exception::class);
         $key = LdapUser::keyName();
+    }
+
+    public function testThrowsWhenConfigKeyMissing()
+    {
+        Config::shouldReceive('get')
+              ->with('auth.key_user_field', null)
+              ->once()
+              ->andReturn(null);
+        $this->expectException(\Exception::class);
+        $lu = new LdapUser([]);
+        $key = $lu->getAuthIdentifierName();
     }
 
     public function testRememberTokenNameIsNull()
