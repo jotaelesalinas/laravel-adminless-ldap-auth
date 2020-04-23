@@ -1,4 +1,4 @@
-# jotaelesalinas/laravel-simple-ldap-auth
+# jotaelesalinas/laravel-adminless-ldap-auth
 
 Authenticate users in Laravel against an _adminless_ LDAP server
 
@@ -35,9 +35,9 @@ As testing environment, we will be using this publicly available testing LDAP se
 Tested on 2020-04-16 with Laravel v7.6 and Adldap2-Laravel v6.0.
 
 If you cannot upgrade to the latest versions, you can have a look at the old tutorials for:
-- [Laravel 6.2 and Adldap2-Laravel 6.0](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/blob/d26ea52ddcc9a1336eb49a9c01469f51f8c83165/README.md)
-- [Laravel 5.7 and Adldap2-Laravel 5.0](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/blob/56fa7c0f46c16cd4a97a11fbf75781f1beedf213/README.md)
-- [Laravel 5.5 and Adldap2-Laravel 3.0](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/blob/4fecf4c94317e27315eb47cf27dfb18567dc13db/README.md)
+- [Laravel 6.2 and Adldap2-Laravel 6.0](https://github.com/jotaelesalinas/laravel-adminless-ldap-auth/blob/d26ea52ddcc9a1336eb49a9c01469f51f8c83165/README.md)
+- [Laravel 5.7 and Adldap2-Laravel 5.0](https://github.com/jotaelesalinas/laravel-adminless-ldap-auth/blob/56fa7c0f46c16cd4a97a11fbf75781f1beedf213/README.md)
+- [Laravel 5.5 and Adldap2-Laravel 3.0](https://github.com/jotaelesalinas/laravel-adminless-ldap-auth/blob/4fecf4c94317e27315eb47cf27dfb18567dc13db/README.md)
 
 **Disclaimer**: I created this GitHub repo because I faced a very specific problem some time ago and I could not find a solution on the internet. I decided to share the solution I came up with, just in case anyone else stumbled upon the same problem. You can consider this a proof-of-concept. I am really sorry but I can't look into your code or provide solutions to other use cases like Active Directory. That said, if you find a problem with this repo, you are very welcome to open an issue, indicating where exactly the error is, or even better, fix it and send a pull request.
 
@@ -52,10 +52,10 @@ composer create-project laravel/laravel adminless && \
 cd adminless
 ```
 
-### Install jotaelesalinas/laravel-simple-ldap-auth
+### Install jotaelesalinas/laravel-adminless-ldap-auth
 
 ```bash
-composer require jotaelesalinas/laravel-simple-ldap-auth
+composer require jotaelesalinas/laravel-adminless-ldap-auth
 ```
 
 ### Add users' login field to `.env`
@@ -442,17 +442,17 @@ If you discover any security related issues, please email jotaelesalinas@example
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
 
-[ico-version]: https://img.shields.io/packagist/v/jotaelesalinas/laravel-simple-ldap-auth.svg?style=flat-square
+[ico-version]: https://img.shields.io/packagist/v/jotaelesalinas/laravel-adminless-ldap-auth.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/jotaelesalinas/laravel-simple-ldap-auth/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/jotaelesalinas/laravel-simple-ldap-auth.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/jotaelesalinas/laravel-simple-ldap-auth.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/jotaelesalinas/laravel-simple-ldap-auth.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/jotaelesalinas/laravel-adminless-ldap-auth/master.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/jotaelesalinas/laravel-adminless-ldap-auth.svg?style=flat-square
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/jotaelesalinas/laravel-adminless-ldap-auth.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/jotaelesalinas/laravel-adminless-ldap-auth.svg?style=flat-square
 
-[link-packagist]: https://packagist.org/packages/jotaelesalinas/laravel-simple-ldap-auth
-[link-travis]: https://travis-ci.org/jotaelesalinas/laravel-simple-ldap-auth
-[link-scrutinizer]: https://scrutinizer-ci.com/g/jotaelesalinas/laravel-simple-ldap-auth/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/jotaelesalinas/laravel-simple-ldap-auth
-[link-downloads]: https://packagist.org/packages/jotaelesalinas/laravel-simple-ldap-auth
+[link-packagist]: https://packagist.org/packages/jotaelesalinas/laravel-adminless-ldap-auth
+[link-travis]: https://travis-ci.org/jotaelesalinas/laravel-adminless-ldap-auth
+[link-scrutinizer]: https://scrutinizer-ci.com/g/jotaelesalinas/laravel-adminless-ldap-auth/code-structure
+[link-code-quality]: https://scrutinizer-ci.com/g/jotaelesalinas/laravel-adminless-ldap-auth
+[link-downloads]: https://packagist.org/packages/jotaelesalinas/laravel-adminless-ldap-auth
 [link-author]: https://github.com/jotaelesalinas
 [link-contributors]: ../../contributors

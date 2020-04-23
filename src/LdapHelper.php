@@ -107,7 +107,7 @@ class LdapHelper
         $userdn = sprintf($this->user_full_dn_fmt, $user_ldap_attribs[$this->bind_field]);
 
         // you might need this, as reported in
-        // [#14](https://github.com/jotaelesalinas/laravel-simple-ldap-auth/issues/14):
+        // [#14](https://github.com/jotaelesalinas/laravel-adminless-ldap-auth/issues/14):
         //Adldap::auth()->bind($userdn, $password, $bindAsUser = true);
         return Adldap::auth()->attempt($userdn, $password, $bindAsUser = true);
     }

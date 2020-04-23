@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="laravel-simple-ldap-auth">
-    <description>The coding standard of laravel-simple-ldap-auth package</description>
+<ruleset name="laravel-adminless-ldap-auth">
+    <description>The coding standard of laravel-adminless-ldap-auth package</description>
     <arg value="p" />
 
     <config name="ignore_warnings_on_exit" value="1" />

@@ -1,5 +1,5 @@
 {
-    "name": "jotaelesalinas/laravel-simple-ldap-auth",
+    "name": "jotaelesalinas/laravel-adminless-ldap-auth",
     "type": "library",
     "description": "Authenticate users in Laravel against an adminless LDAP server",
     "keywords": [
@@ -14,7 +14,7 @@
         "no admin",
         "login"
     ],
-    "homepage": "https://github.com/jotaelesalinas/laravel-simple-ldap-auth",
+    "homepage": "https://github.com/jotaelesalinas/laravel-adminless-ldap-auth",
     "license": "MIT",
     "authors": [
         {
