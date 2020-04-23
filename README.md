@@ -3,11 +3,13 @@
 Authenticate users in Laravel against an _adminless_ LDAP server
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
+[![Total Downloads][ico-downloads]][link-downloads]
 [![Software License][ico-license]](LICENSE.md)
+<!--
 [![Build Status][ico-travis]][link-travis]
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
-[![Total Downloads][ico-downloads]][link-downloads]
+-->
 
 This is a detailed step-by-step [Laravel](https://laravel.com/) installation manual adapted
 for _adminless_ LDAP authentication.
