@@ -2,14 +2,14 @@
 
 Authenticate users in Laravel against an _adminless_ LDAP server
 
-## Login UI
+## Login UI guide
 
 You can build your own web login system around `Auth`, but as you already probably know,
 Laravel provides an amazing scaffold for authentication. Here's how you can use it.
 
 We are going to assume that you created a new, clean Laravel app and that you already went through the installation and configuration of the package and that everything worked perfectly when you tested it in Tinker.
 
-### Create the auth routes, controllers and views
+### Scaffold the auth routes, controllers and views
 
 ```bash
 composer require laravel/ui

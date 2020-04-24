@@ -254,6 +254,10 @@ Remember that you have these users available in the public testing LDAP server:
 
 Was this package useful? Give it a star!
 
+## Login UI (routes, controllers, views)
+
+If you want to see how to build a login UI adapted to this specific adminless LDAP system, you can read the [Login UI guide](docs/login-ui.md).
+
 ## To do
 
 - [ ] Upload to packagist
