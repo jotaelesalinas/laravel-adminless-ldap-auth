@@ -16,18 +16,18 @@ To understand how configuration works, you have to know first the different step
 
     If there is a matching user, we will have a list of attributes from the LDAP user like this:
 
-```php
-[
-    'uid' => 'jdoe',
-    'cn' => 'John Doe',
-    'mail' => 'jdoe@example.com',
-    'telephonenumber' => '555-12-23-34',
-    'department' => 'Sales',
-    'location' => 'HQ',
-    'distinguishedName' => 'cn=John Doe,dc=example,dc=com',
-    ...
-]
-```
+    ```php
+    [
+        'uid' => 'jdoe',
+        'cn' => 'John Doe',
+        'mail' => 'jdoe@example.com',
+        'telephonenumber' => '555-12-23-34',
+        'department' => 'Sales',
+        'location' => 'HQ',
+        'distinguishedName' => 'cn=John Doe,dc=example,dc=com',
+        ...
+    ]
+    ```
 
 3. Then, we check that the credentials are correct. But! For authentication, LDAP does not use identifier + password. It uses "distinguished name" + password.
 
