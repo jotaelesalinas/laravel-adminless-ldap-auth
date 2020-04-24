@@ -197,7 +197,7 @@ want "imported" into your Auth user _on every sucessful login_.
 
 ## Usage
 
-That's it! Now you should be able to use [Laravel's built-in authentication](https://laravel.com/docs/7.x/authentication#included-authenticating) to perform all auth-related tasks, e.g. `Auth::check()`, `Auth::attempt()`, `Auth::user()`, etc.
+That's it! Now you should be able to use [Laravel's built-in authentication](https://laravel.com/docs/7.x/authentication#authenticating-users) to perform all auth-related tasks, e.g. `Auth::check()`, `Auth::attempt()`, `Auth::user()`, etc.
 
 You can try with tinker:
 
@@ -286,11 +286,7 @@ If you discover any security related issues, please email jotaelesalinas@example
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-The values shown in the previous example configuration make use of a publicly available testing LDAP server:
-
-[http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
-
-The authors of this package are not linked in any way with forumsys.com . We are not responsible in any way for anything related to it.
+The configuration showed in this document makes use of a [publicly available testing LDAP server](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/). The authors of this package are not linked in any way with it and are not responsible nor liable in any way for anything related to it.
 
 [ico-version]: https://img.shields.io/packagist/v/jotaelesalinas/laravel-adminless-ldap-auth.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
