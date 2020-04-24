@@ -50,8 +50,6 @@ With these ones:
 Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
 Route::post('logout', 'Auth\LoginController@logout')->name('logout');
-// If you want to be able to log out using the /logout URL:
-Route::get('logout', 'Auth\LoginController@logout');
 ```
 
 ### Specify the users' identifier field in the login controller
