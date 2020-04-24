@@ -25,11 +25,7 @@ composer require jotaelesalinas/laravel-adminless-ldap-auth
 
 Go on with the configuration. The package will not work if it is not properly configured.
 
-## Configuration -- Mandatory!
-
-### Add variables to `.env`
-
----
+## Configuration
 
 **A note on the most important .env variables**
 
@@ -41,7 +37,7 @@ Go on with the configuration. The package will not work if it is not properly co
 
 See an [explanation of how the library works](docs/explanation.md) for a better understanding of the rationale behind the different variables.
 
----
+### Add variables to `.env`
 
 You will need the assistance of your LDAP administrator to get these options right.
 
@@ -222,14 +218,14 @@ Auth::user()
 Auth::id()
 => null
 
-Auth::attempt(['id' => 'einstein', 'password' => ''])
+Auth::attempt(['username' => 'einstein', 'password' => ''])
 // Throws Adldap/Auth/PasswordRequiredException.
 
-Auth::attempt(['id' => 'einstein', 'password' => 'qwerty'])
+Auth::attempt(['username' => 'einstein', 'password' => 'qwerty'])
 // Issues a warning about ldap_bind() unable to bind to server and invalid credentials.
 => false
 
-Auth::attempt(['id' => 'einstein', 'password' => 'password'])
+Auth::attempt(['username' => 'einstein', 'password' => 'password'])
 // In tinker it will issue a warning about the session storage. Just ignore it.
 => true
 
@@ -239,10 +235,10 @@ Auth::check()
 => true
 Auth::user()
 => JotaEleSalinas\AdminlessLdap\LdapUser {
-     +"id": "einstein",
-     +"name": "Albert Einstein",
-     +"email": "einstein@ldap.forumsys.com",
-     +"phone": "314-159-2653",
+     username: "einstein",
+     name: "Albert Einstein",
+     email: "einstein@ldap.forumsys.com",
+     phone: "314-159-2653",
    }
 Auth::id()
 => "einstein"

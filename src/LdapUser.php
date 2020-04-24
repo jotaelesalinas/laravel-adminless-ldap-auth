@@ -18,7 +18,7 @@ class LdapUser extends GenericUser
     {
         $column_name = Config::get('auth.auth_user_key', null);
         if (!$column_name) {
-            throw new \Exception('LdapUser: Could not find keyName.');
+            throw new \Exception('LdapUser: missing config variable "auth.auth_user_key".');
         }
         return $column_name;
     }
@@ -26,6 +26,11 @@ class LdapUser extends GenericUser
     public function getAuthIdentifierName()
     {
         return self::keyName();
+    }
+
+    public function getRememberToken()
+    {
+        return null;
     }
 
     public function getRememberTokenName()
