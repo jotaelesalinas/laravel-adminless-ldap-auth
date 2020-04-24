@@ -31,7 +31,7 @@ composer require jotaelesalinas/laravel-adminless-ldap-auth
 
 - `AUTH_USER_KEY_FIELD`: the name of the property that will uniquely identify the Auth user. By default, the name is `username` and the value is read from the LDAP user attribute `LDAP_USER_SEARCH_ATTRIBUTE`.
 
-See an [explanation of how the library works](docs/explanation.md) of how the library works for a better understanding of the rationale behind the different variables.
+See an [explanation of how the library works](docs/explanation.md) for a better understanding of the rationale behind the different variables.
 
 ## Configuration
 
@@ -285,8 +285,6 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 The values shown in the previous example configuration make use of a publicly available testing LDAP server:
 
 [http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/)
-
-It is recommended that you start by testing that it works against this server -if possible- and then changing the configuration to your specific setup.
 
 The authors of this package are not linked in any way with forumsys.com . We are not responsible in any way for anything related to it.
 
