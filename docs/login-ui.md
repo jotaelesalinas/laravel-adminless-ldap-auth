@@ -147,7 +147,7 @@ Visit <http://localhost:8000> in your favourite browser.
 
 Try to visit <http://localhost:8000/home> before logging in. You should be redirected to the login page.
 
-**Bonus!** Because you read this tutorial about creating the login UI, you can also login to the public testing LDAP server using these new users: `riemann` and `gauss`. The password is `password` as usual.
+**New achievement!** You read the guide about creating the login UI! You have unlocked two new users in the public testing LDAP server: `riemann` and `gauss`. The password is `password` as usual.
 
 Log in and play around.
 

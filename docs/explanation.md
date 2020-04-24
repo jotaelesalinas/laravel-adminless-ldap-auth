@@ -76,6 +76,6 @@ To understand how configuration works, you have to know first the different step
 
 Don't hesitate to propose improvements if you think something is unclear or not properly explained.
 
-**New achievement!** This article was a yawner, but you finished it and you have unblocked two new users in the public testing LDAP server: `euler` and `euclid`. The password is `password` for both of them. Congratulations!
+**Bonus!** This document was a yawner, but you finished it! Congratulations! Now you can also login to the public testing LDAP server using these new users: `euler` and `euclid`. The password is `password` for both of them.
 
 Was this package useful? Give it a star!
