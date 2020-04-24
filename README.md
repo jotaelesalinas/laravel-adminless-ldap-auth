@@ -23,7 +23,15 @@ Authenticate users in Laravel against an _adminless_ LDAP server
 composer require jotaelesalinas/laravel-adminless-ldap-auth
 ```
 
-## Basic .env variables
+Go on with the configuration. The package will not work if it is not properly configured.
+
+## Configuration -- Mandatory!
+
+### Add variables to `.env`
+
+---
+
+**A note on the most important .env variables**
 
 - `LDAP_USER_SEARCH_ATTRIBUTE`: the name of the attribute in the LDAP server that uniquely identifies a user, e.g. `uid`, `mail` or `sAMAccountName`. The value of this attribute is what the user will have to type as identifier in the login form (+ the password, of course).
 
@@ -33,9 +41,7 @@ composer require jotaelesalinas/laravel-adminless-ldap-auth
 
 See an [explanation of how the library works](docs/explanation.md) for a better understanding of the rationale behind the different variables.
 
-## Configuration
-
-### Add variables to `.env`
+---
 
 You will need the assistance of your LDAP administrator to get these options right.
 
