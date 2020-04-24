@@ -63,7 +63,7 @@ public function username()
 }
 ```
 
-### Adapt login form
+### Adapt the login form view
 
 In `resources/views/auth/login.blade.php`, change `email` to `config('auth.auth_user_key')` (HTML code might change in the future):
 
