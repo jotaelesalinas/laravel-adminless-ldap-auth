@@ -260,14 +260,13 @@ If you want to see how to build a login UI adapted to this specific adminless LD
 
 ## To do
 
-- [ ] Upload to packagist
-- [ ] Set up the GitHub Hook for Packagist <https://packagist.org/about#how-to-update-packages>
-- [ ] Do we have to trigger events for login attempts, success, failure, logout, etcc? Or are they triggered somewhere else?
+- [ ] Tests -- WIP
 - [ ] Instructions for ActiveDirectory -- help needed, I don't have access to any AD server
-- [ ] Tests -- ongoing
-- [ ] Remove Adldap2 dependency and use [PHP's LDAP module](https://www.php.net/manual/en/book.ldap.php) directly
+- [ ] Do we have to trigger events for login attempts, success, failure, logout, etc? Or are they triggered somewhere else?
 - [x] Add instructions to build the login UI
 - [x] Extend `LdapUser` on `Illuminate\Auth\GenericUser`
+- [x] Upload to packagist
+- [x] Set up the GitHub Hook for Packagist to automate new versions
 
 ## Contributing
 
