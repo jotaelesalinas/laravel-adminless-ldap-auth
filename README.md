@@ -287,7 +287,7 @@ If you discover any security related issues, please email jotaelesalinas@example
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-The configuration showed in this document makes use of a [publicly available testing LDAP server](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/). The authors of this package are not linked in any way with it and are not responsible nor liable in any way for anything related to it.
+The configuration shown in this document makes use of a [publicly available testing LDAP server](http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/). The authors of this package are not linked in any way with it and are not responsible nor liable in any way for anything related to it.
 
 [ico-version]: https://img.shields.io/packagist/v/jotaelesalinas/laravel-adminless-ldap-auth.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
