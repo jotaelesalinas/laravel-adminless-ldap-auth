@@ -104,7 +104,7 @@ Modify the web guard to use the new `ldap` provider:
 
 Delete the `api` guard if you dont need it. Or at least comment it out.
 
-Create this new entry:
+**Important!** Create this new entry:
 
 ```php
 'auth_user_key' => env('AUTH_USER_KEY_FIELD', null),
@@ -168,7 +168,9 @@ Again, you will need the assistance of your LDAP administrator. See comments bel
 
 ### Configure the LDAP authentication in `config/ldap_auth.php`
 
-Tell the Adldap library how to search and bind users in your LDAP server:
+Tell the Adldap library how to search and bind users in your LDAP server.
+
+**Important!** Do not forget to add the entry `user_format`.
 
 ```php
 'identifiers' => [
