@@ -256,7 +256,7 @@ Auth::user()
 Remember that you have these users available in the public testing LDAP server:
 `einstein`, `newton` and `tesla`. The password is `password` for all of them.
 
-Was this package useful? Give it a star!
+Was this package useful? Give it a star or consider sponsoring me!
 
 ## Login UI (routes, controllers, views)
 
