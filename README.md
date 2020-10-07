@@ -285,6 +285,10 @@ If you discover any security related issues, please email jotaelesalinas@example
 - [José Luis Salinas][link-author]
 - [All Contributors][link-contributors]
 
+## Sponsoring
+
+Did this package save your day? Are you making $$$ out of it? Give back by [sponsoring me](https://github.com/sponsors/jotaelesalinas)!
+
 ## License and disclaimer
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
