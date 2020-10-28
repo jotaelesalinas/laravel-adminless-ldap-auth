@@ -58,16 +58,6 @@ LDAP_CONNECTION=default             # which configuration to use from config/lda
 
 These are just a few options, the ones needed to make this example work. There are many more in `config/ldap.php`.
 
-**For ActiveDirectory users**
-
-This configuration might work for you (I can't promise it will):
-
-```bash
-LDAP_SCHEMA=ActiveDirectory
-LDAP_USER_SEARCH_ATTRIBUTE=sAMAccountName
-LDAP_USER_BIND_ATTRIBUTE=cn
-```
-
 Also, add the name of the property that will uniquely identify your Auth user:
 
 ```bash
@@ -75,6 +65,34 @@ AUTH_USER_KEY_FIELD=username
 ```
 
 You can change the value of `AUTH_USER_KEY_FIELD` to whatever you want, e.g. `id`, `email` or `phonenumber`, but you don't really have to.
+
+**For Windows ActiveDirectory users**
+
+Based on some feedback, this configuration might work for you (I can't promise it will):
+
+```bash
+LDAP_SCHEMA=ActiveDirectory
+LDAP_USER_SEARCH_ATTRIBUTE=sAMAccountName
+LDAP_USER_BIND_ATTRIBUTE=cn
+```
+
+**Testing with Apache Direcory**
+
+I have been able to test ActiveDirectory using the docker image `dwimberger/ldap-ad-it` with an [Apache Directory](https://directory.apache.org/) installation. Thanks to James Hamilton for this [video](https://www.youtube.com/watch?v=-6fAr13j1AM).
+
+I know it is not the same as Windows' RSAT ActiveDirectory, but it is what I have been able to test.
+
+This is the configuration that worked for me after running the docker image:
+
+```bash
+LDAP_SCHEMA=ActiveDirectory
+LDAP_HOSTS=127.0.0.1
+LDAP_PORT=10389
+LDAP_BASE_DN=ou=users,dc=wimpi,dc=net
+```
+
+Also, I had to modify the code to pre-connect to the LDAP server before attempting to search for a user.
+I think this was probably the real issue most people had when trying to use the library with AD.
 
 ### Modify `config/auth.php`
 
@@ -256,7 +274,25 @@ Auth::user()
 Remember that you have these users available in the public testing LDAP server:
 `einstein`, `newton` and `tesla`. The password is `password` for all of them.
 
-Was this package useful? Give it a star or consider sponsoring me!
+If you want to see which attributes are available for each user in the LDAP server, run this in Tinker:
+
+```php
+$lh = new JotaEleSalinas\AdminlessLdap\LdapHelper(config('ldap_auth'))
+=> JotaEleSalinas\AdminlessLdap\LdapHelper
+$lh->retrieveLdapAttribs('einstein', 'password')
+=> [
+     "userpassword" => "{sha}W6ph5Mm5Pz8GgiULbPgzG37mj9g=",
+     "cn" => "Albert Einstein",
+     "sn" => "Einstein",
+     "uid" => "einstein",
+     "mail" => "einstein@ldap.forumsys.com",
+     "telephonenumber" => "314-159-2653",
+     "dn" => "uid=einstein,dc=example,dc=com",
+   ]
+```
+
+Was this package useful? Give it a star.
+Did it save your day? Are you making money out of it? Consider [sponsoring me](https://github.com/sponsors/jotaelesalinas)!
 
 ## Login UI (routes, controllers, views)
 

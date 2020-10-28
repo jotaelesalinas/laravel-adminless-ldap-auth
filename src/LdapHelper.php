@@ -22,7 +22,7 @@ class LdapHelper
         $this->sync_attributes = $config['sync_attributes'];
     }
 
-    protected function retrieveLdapAttribs(string $identifier) : ?array
+    public function retrieveLdapAttribs(string $identifier, string $password) : ?array
     {
         static $cached_users = [];
 
@@ -34,6 +34,10 @@ class LdapHelper
             return $cached_users[$identifier];
         }
 
+        // bind to server as the provided user
+        $provider = Adldap::getProvider(config('ldap_auth.connection'));
+        $provider->connect(sprintf(config('ldap_auth.identifiers.ldap.user_format'), $identifier), $password);
+        
         $ldapuser = Adldap::search()->where($this->search_field, '=', $identifier)->first();
         if (!$ldapuser) {
             // log error
@@ -60,9 +64,9 @@ class LdapHelper
     }
 
     // Retrieves an LDAP user by identifier, no password checking yet
-    public function retrieveUser(string $identifier) : ?array
+    public function retrieveUser(string $identifier, string $password) : ?array
     {
-        $user = $this->retrieveLdapAttribs($identifier);
+        $user = $this->retrieveLdapAttribs($identifier, $password);
         if ( !$user ) {
             return null;
         }
@@ -98,7 +102,7 @@ class LdapHelper
             return false;
         }
         
-        $user_ldap_attribs = $this->retrieveLdapAttribs($identifier);
+        $user_ldap_attribs = $this->retrieveLdapAttribs($identifier, $password);
 
         if ($user_ldap_attribs[$this->search_field] != $identifier) {
             return false;

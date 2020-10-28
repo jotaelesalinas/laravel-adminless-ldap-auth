@@ -36,7 +36,7 @@ class AdminlessUserProvider implements UserProvider
         // check if the password is ok, only retrieve a user by identifier
         $username = $credentials[LdapUser::keyName()];
 
-        $userdata = $this->ldap_helper->retrieveUser($username);
+        $userdata = $this->ldap_helper->retrieveUser($username, $credentials['password']);
         if (!$userdata) {
             return null;
         }
