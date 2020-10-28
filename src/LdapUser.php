@@ -38,7 +38,8 @@ class LdapUser extends GenericUser
         return null;
     }
 
-    public function __debugInfo() {
+    public function __debugInfo()
+    {
         return $this->attributes;
     }
 }

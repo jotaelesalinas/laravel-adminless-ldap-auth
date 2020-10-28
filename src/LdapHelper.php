@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class LdapHelper
 {
+    protected $connection = null;
     protected $search_field = null;
     protected $bind_field = null;
     protected $user_full_dn_fmt = null;
@@ -16,6 +17,7 @@ class LdapHelper
     // Makes sure that the needed config options exist and caches them
     public function __construct($config)
     {
+        $this->connection = $config['connection'];
         $this->search_field = $config['identifiers']['ldap']['locate_users_by'];
         $this->bind_field = $config['identifiers']['ldap']['bind_users_by'];
         $this->user_full_dn_fmt = $config['identifiers']['ldap']['user_format'];
@@ -35,8 +37,8 @@ class LdapHelper
         }
 
         // bind to server as the provided user
-        $provider = Adldap::getProvider(config('ldap_auth.connection'));
-        $provider->connect(sprintf(config('ldap_auth.identifiers.ldap.user_format'), $identifier), $password);
+        $provider = Adldap::getProvider($this->connection);
+        $provider->connect(sprintf($this->user_full_dn_fmt, $identifier), $password);
         
         $ldapuser = Adldap::search()->where($this->search_field, '=', $identifier)->first();
         if (!$ldapuser) {
@@ -53,7 +55,7 @@ class LdapHelper
         foreach ($ldapuser_attrs as $k => $v) {
             if ($k == 'objectclass') {
                 continue;
-            } else if (preg_match('/^\d+$/', $k . '')) {
+            } elseif (preg_match('/^\d+$/', $k . '')) {
                 continue;
             }
             $attrs[$k] = is_array($v) ? $v[0] : $v;
@@ -67,7 +69,7 @@ class LdapHelper
     public function retrieveUser(string $identifier, string $password) : ?array
     {
         $user = $this->retrieveLdapAttribs($identifier, $password);
-        if ( !$user ) {
+        if (!$user) {
             return null;
         }
 

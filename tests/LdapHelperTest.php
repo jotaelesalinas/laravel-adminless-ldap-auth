@@ -7,19 +7,17 @@ use Mockery;
 
 use Adldap\Laravel\Facades\Adldap;
 
-class _CustomException extends \Exception {}
-
 class LdapHelperTest extends TestCase
 {
     protected $err_handler = null;
     
-    public function __construct ()
+    public function __construct()
     {
         parent::__construct();
-        $this->err_handler = function ($errno, $errstr, $errfile, $errline ) {
+        $this->err_handler = function ($errno, $errstr, $errfile, $errline) {
             // We are only interested in one kind of error
-            if ( preg_match('/^Undefined index: \w+\b/', $errstr) ) {
-                throw new _CustomException($errstr);
+            if (preg_match('/^Undefined index: \w+\b/', $errstr)) {
+                throw new CustomTestException($errstr);
             }
             return false;
         };
@@ -31,9 +29,10 @@ class LdapHelperTest extends TestCase
         parent::tearDown();
     }
 
-    protected static function config ()
+    protected static function config()
     {
         return [
+            'connection' => 'default',
             'identifiers' => [
                 'ldap' => [
                     'locate_users_by' => 'sAMAccountName',
@@ -52,7 +51,7 @@ class LdapHelperTest extends TestCase
     public function testConstructWrongParams()
     {
         set_error_handler($this->err_handler);
-        $this->expectException(_CustomException::class);
+        $this->expectException(CustomTestException::class);
         $lh = new LdapHelper([]);
         restore_error_handler();
     }
@@ -62,7 +61,7 @@ class LdapHelperTest extends TestCase
         $config = self::config();
         set_error_handler($this->err_handler);
         unset($config['identifiers']['ldap']['locate_users_by']);
-        $this->expectException(_CustomException::class);
+        $this->expectException(CustomTestException::class);
         $lh = new LdapHelper($config);
         restore_error_handler();
     }
@@ -72,7 +71,7 @@ class LdapHelperTest extends TestCase
         $config = self::config();
         set_error_handler($this->err_handler);
         unset($config['identifiers']['ldap']['bind_users_by']);
-        $this->expectException(_CustomException::class);
+        $this->expectException(CustomTestException::class);
         $lh = new LdapHelper($config);
         restore_error_handler();
     }
@@ -82,7 +81,7 @@ class LdapHelperTest extends TestCase
         $config = self::config();
         set_error_handler($this->err_handler);
         unset($config['identifiers']['ldap']['user_format']);
-        $this->expectException(_CustomException::class);
+        $this->expectException(CustomTestException::class);
         $lh = new LdapHelper($config);
         restore_error_handler();
     }
@@ -92,7 +91,7 @@ class LdapHelperTest extends TestCase
         $config = self::config();
         $lh = new LdapHelper($config);
 
-        $userdata = $lh->retrieveUser('');
+        $userdata = $lh->retrieveUser('', '');
         $this->assertNull($userdata);
 
         $mock_first = Mockery::mock();
@@ -104,11 +103,19 @@ class LdapHelperTest extends TestCase
                     ->with($config['identifiers']['ldap']['locate_users_by'], '=', 'asdf')
                     ->andReturn($mock_first);
 
+        $mock_provider = Mockery::mock(); // Adldap\Connections\Provider
+        $mock_provider->shouldReceive('connect')
+                      ->andReturn(true);
+
+        Adldap::shouldReceive('getProvider')
+              ->once()
+              ->andReturn($mock_provider);
+        
         Adldap::shouldReceive('search')
               ->once()
               ->andReturn($mock_search);
         
-        $userdata = $lh->retrieveUser('asdf');
+        $userdata = $lh->retrieveUser('asdf', 'qwertz');
         $this->assertNull($userdata);
     }
 
