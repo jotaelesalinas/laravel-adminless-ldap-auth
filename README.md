@@ -82,7 +82,7 @@ I have been able to test ActiveDirectory using the docker image `dwimberger/ldap
 
 I know it is not the same as Windows' RSAT ActiveDirectory, but it is what I have been able to test.
 
-This is the configuration that worked for me after running the docker image:
+These are the `.env` variables that I had to change to make it work:
 
 ```bash
 LDAP_SCHEMA=ActiveDirectory
