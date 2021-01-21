@@ -120,7 +120,7 @@ Modify the web guard to use the new `ldap` provider:
 ],
 ```
 
-Delete the `api` guard if you dont need it. Or at least comment it out.
+Delete the `api` guard if you don't need it. Or at least comment it out.
 
 **Important!** Create this new entry:
 
@@ -205,7 +205,7 @@ Tell the Adldap library how to search and bind users in your LDAP server.
 ```
 
 And tell the new auth provider which fields from the LDAP user entry you will
-want "imported" into your Auth user _on every sucessful login_.
+want "imported" into your Auth user _on every successful login_.
 
 ```php
 'sync_attributes' => [
