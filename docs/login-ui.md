@@ -122,8 +122,10 @@ With:
 
 <p>Your user data:</p>
 
-<pre>
-{{ json_encode(Auth::user(), JSON_PRETTY_PRINT) }}
+<pre class="p-3 bg-dark text-light">
+@php
+    var_dump(Auth::user())
+@endphp
 </pre>
 ```
 
