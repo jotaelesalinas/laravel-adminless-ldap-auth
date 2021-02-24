@@ -4,10 +4,14 @@ declare(strict_types=1);
 namespace JotaEleSalinas\AdminlessLdap;
 
 use Illuminate\Auth\GenericUser;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Support\Facades\Config;
 
-class LdapUser extends GenericUser
+class LdapUser extends GenericUser implements AuthorizableContract
 {
+    use Authorizable;
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
