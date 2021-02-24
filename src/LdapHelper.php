@@ -38,16 +38,17 @@ class LdapHelper
 
         // bind to server as the provided user
         $provider = Adldap::getProvider($this->connection);
-        $provider->connect(sprintf($this->user_full_dn_fmt, $identifier), $password);
+        try {
+            $provider->connect(sprintf($this->user_full_dn_fmt, $identifier), $password);
+        } catch (\Adldap\Auth\BindException $e) {
+            return null;
+        }
         
         $ldapuser = Adldap::search()->where($this->search_field, '=', $identifier)->first();
         if (!$ldapuser) {
             // log error
             return null;
         }
-        // if you want to see the list of available attributes in your specific LDAP server:
-        // dd($ldapuser);
-        // and look for `attributes` (protected)
         
         $ldapuser_attrs = self::accessProtected($ldapuser, 'attributes');
 
