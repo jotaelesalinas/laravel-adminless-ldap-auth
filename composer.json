@@ -46,7 +46,7 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpunit",
+        "test": "vendor/bin/phpunit tests",
         "check-style": "phpcs src tests",
         "fix-style": "phpcbf src tests"
     },
