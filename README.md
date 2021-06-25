@@ -203,7 +203,7 @@ Tell the Adldap library how to search and bind users in your LDAP server.
         'locate_users_by' => env('LDAP_USER_SEARCH_ATTRIBUTE', ''),
         'bind_users_by' => env('LDAP_USER_BIND_ATTRIBUTE', ''),
         'user_format' => env('LDAP_USER_FULL_DN_FMT', ''),
-        'member_format' => env('LDAP_MEMBER_SEARCH_FMT', ''),
+        'member_format' => env('LDAP_MEMBER_OF', '') == '' ? '' : env('LDAP_MEMBER_SEARCH_FMT', ''),
     ],
 
     // ... other code ...
