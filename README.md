@@ -228,6 +228,14 @@ php artisan optimize:clear
 php artisan tinker
 ```
 
+If you get an error saying that writing to /path/to/folder/.config/psysh is not allowed, try adding this line to your `.env`:
+
+```bash
+XDG_CONFIG_HOME=.
+```
+
+Run these instructions to test the applicacion in real time:
+
 ```php
 Auth::guest()
 => true
@@ -239,14 +247,12 @@ Auth::id()
 => null
 
 Auth::attempt(['username' => 'einstein', 'password' => ''])
-// Throws Adldap/Auth/PasswordRequiredException.
+=> false
 
 Auth::attempt(['username' => 'einstein', 'password' => 'qwerty'])
-// Issues a warning about ldap_bind() unable to bind to server and invalid credentials.
 => false
 
 Auth::attempt(['username' => 'einstein', 'password' => 'password'])
-// In tinker it will issue a warning about the session storage. Just ignore it.
 => true
 
 Auth::guest()
