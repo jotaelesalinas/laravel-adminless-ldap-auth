@@ -19,8 +19,16 @@ Authenticate users in Laravel against an _adminless_ LDAP server
 
 ## Installation
 
+You need an existing Laravel project. Inside its folder, type:
+
 ```bash
 composer require jotaelesalinas/laravel-adminless-ldap-auth
+```
+
+You might get an error saying that your requirements could not be resolved to an installable set of packages. This is usually caused by adldap2/adldap2 depending on different versions of some packages also required by Laravel. This problem is usually solved adding the option `-W` (or `--update-with-all-dependencies`), but be warned that this could cause issues.
+
+```bash
+composer require jotaelesalinas/laravel-adminless-ldap-auth -W
 ```
 
 Go on with the configuration. The package will not work if it is not properly configured.
