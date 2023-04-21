@@ -59,7 +59,38 @@ class LdapHelper
             } elseif (preg_match('/^\d+$/', $k . '')) {
                 continue;
             }
-            $attrs[$k] = is_array($v) ? $v[0] : $v;
+            // Inserito controllo su memberOf per recuperare il GdS TRN_GESAS_* dalla lista dell'utente loggato (altrimenti recupera solo il primo oggetto)
+
+            elseif ($k == 'memberof') {
+                foreach($v as $n => $gds) {
+
+                    if(str_contains($gds, 'CN=TRN_GESAS_')){
+
+                        // Formatto il GdS completo in modo da avere solo il nome del TRN_GESAS_*
+
+                        $gds_format_mid = str_replace('CN=','',$gds);
+                        $gds_format_end = str_replace(',OU=Gruppi di sicurezza,DC=ternaren,DC=prv','',$gds_format_mid);
+
+                        $attrs[$k] = $gds_format_end;
+
+                        // Solo test gruppi vari:
+
+                        //$attrs[$k] = 'TRN_GESAS_EXT';
+
+                    }
+                }
+
+                // Se non trova nessun GdS TRN_GESAS_*, non farlo accedere
+
+                if (!isset($attrs[$k])) {
+                    return null;
+                }
+            }
+
+            // Fine controllo memberOf
+            else{
+                $attrs[$k] = is_array($v) ? $v[0] : $v;
+            }
         }
 
         $cached_users[$identifier] = $attrs;
