@@ -12,6 +12,7 @@ class LdapHelper
     protected $search_field = null;
     protected $bind_field = null;
     protected $user_full_dn_fmt = null;
+    protected $member_search_fmt = null;
     protected $sync_attributes = null;
 
     // Makes sure that the needed config options exist and caches them
@@ -21,6 +22,7 @@ class LdapHelper
         $this->search_field = $config['identifiers']['ldap']['locate_users_by'];
         $this->bind_field = $config['identifiers']['ldap']['bind_users_by'];
         $this->user_full_dn_fmt = $config['identifiers']['ldap']['user_format'];
+        $this->member_search_fmt = $config['identifiers']['ldap']['member_format'];
         $this->sync_attributes = $config['sync_attributes'];
     }
 
@@ -43,13 +45,13 @@ class LdapHelper
         } catch (\Adldap\Auth\BindException $e) {
             return null;
         }
-        
+
         $ldapuser = Adldap::search()->where($this->search_field, '=', $identifier)->first();
         if (!$ldapuser) {
             // log error
             return null;
         }
-        
+
         $ldapuser_attrs = self::accessProtected($ldapuser, 'attributes');
 
         $attrs = [];
@@ -104,7 +106,7 @@ class LdapHelper
         if ($identifier === '') {
             return false;
         }
-        
+
         $user_ldap_attribs = $this->retrieveLdapAttribs($identifier, $password);
 
         if ($user_ldap_attribs[$this->search_field] != $identifier) {
@@ -116,6 +118,14 @@ class LdapHelper
         // you might need this, as reported in
         // [#14](https://github.com/jotaelesalinas/laravel-adminless-ldap-auth/issues/14):
         //Adldap::auth()->bind($userdn, $password, $bindAsUser = true);
-        return Adldap::auth()->attempt($userdn, $password, $bindAsUser = true);
+        if (Adldap::auth()->attempt($userdn, $password, $bindAsUser = true)) {
+            if (!empty($this->member_search_fmt)) {
+                $member_search = sprintf($this->member_search_fmt, $userdn);
+                return Adldap::search()->query($member_search)->isNotEmpty();
+            }
+            //no search defined
+            return true;
+        }
+        return false;
     }
 }

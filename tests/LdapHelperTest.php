@@ -10,7 +10,7 @@ use Adldap\Laravel\Facades\Adldap;
 class LdapHelperTest extends TestCase
 {
     protected $err_handler = null;
-    
+
     public function __construct()
     {
         parent::__construct();
@@ -38,6 +38,7 @@ class LdapHelperTest extends TestCase
                     'locate_users_by' => 'sAMAccountName',
                     'bind_users_by' => 'cn',
                     'user_format' => 'cn=%s,ou=users,dc=Acme,dc=corp',
+                    'member_format' => '(&(objectclass=someClass)(&(cn=someMemberOf)(uniqueMember=%s)))',
                 ],
             ],
             'sync_attributes' => [
@@ -110,11 +111,11 @@ class LdapHelperTest extends TestCase
         Adldap::shouldReceive('getProvider')
               ->once()
               ->andReturn($mock_provider);
-        
+
         Adldap::shouldReceive('search')
               ->once()
               ->andReturn($mock_search);
-        
+
         $userdata = $lh->retrieveUser('asdf', 'qwertz');
         $this->assertNull($userdata);
     }
@@ -135,7 +136,7 @@ class LdapHelperTest extends TestCase
         //Adldap::shouldReceive('auth')
         //      ->once()
         //      ->andReturn($mock_attempt);
-        
+
         // ['sAMAccountName' => 'jdoe', 'cn' => 'John Doe', 'email' => 'jdoe@example.com']
         //$userdata = $lh->checkCredentials('asdf', '');
         //$this->assertFalse($userdata);
