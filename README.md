@@ -54,8 +54,8 @@ LDAP_USER_FULL_DN_FMT=${LDAP_USER_BIND_ATTRIBUTE}=%s,${LDAP_BASE_DN}
                                     # full user distinguished name to be used with sprintf:
                                     # %s will be replaced by $user->${LDAP_USER_BIND_ATTRIBUTE}
 LDAP_CONNECTION=default             # which configuration to use from config/ldap.php
-LDAP_MEMBER_OC=                     # Object Class of permission
-LDAP_MEMBER_OF=                     # member_of group name
+LDAP_MEMBER_OC=                     # Object Class of permission (leave empty when not used)
+LDAP_MEMBER_OF=                     # member_of group name (leave empty when not used)
 LDAP_MEMBER_SEARCH_FMT="(&(objectclass=${LDAP_MEMBER_OC})(&(cn=${LDAP_MEMBER_OF})(uniqueMember=%s)))" 
                                     # complete search string for the ldap server 
                                     # %s will be replaced by users dn
