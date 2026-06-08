@@ -1,3 +1,19 @@
+> # ⚠️ This package is no longer maintained
+>
+> This package was built on top of [Adldap2-Laravel](https://github.com/Adldap2/Adldap2-Laravel),
+> which has been **archived and is no longer maintained**.
+>
+> If you came here looking to authenticate users against an LDAP server using
+> their own credentials — without storing or syncing users in a local database —
+> use **LdapRecord-Laravel** instead. Its **Plain Authentication** mode does
+> exactly that, and it's the actively maintained successor (by the same author as Adldap2).
+>
+> ### 👉 [LdapRecord-Laravel → Plain Authentication](https://ldaprecord.com/docs/laravel/v3/auth/plain)
+>
+> The original documentation below is kept for historical reference only.
+
+---
+
 # jotaelesalinas/laravel-adminless-ldap-auth
 
 Authenticate users in Laravel against an _adminless_ LDAP server
